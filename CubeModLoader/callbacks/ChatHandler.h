@@ -1,5 +1,13 @@
 extern "C" int ChatHandler(std::wstring* msg) {
 	for (uint8_t priority = 0; priority <= 4; priority += 1) {
+		if (CommandsWrapper::isCommandSyntaxValid(msg)) {
+			for (DLL* dll : modDLLs) {
+				std::wstring command_name = std::wstring(CommandsWrapper::getCommandName(msg));
+				dll->mod->cmd_manager.getCommand(&command_name);
+				//if (cmd == nullptr) continue;
+				//cmd->RunCommand(); // TODO: make it work with functions as well.
+			}
+		}
 		for (DLL* dll : modDLLs) {
 			if (dll->mod->OnChatPriority == (GenericMod::Priority)priority) {
 				if (dll->mod->OnChat(msg)) {

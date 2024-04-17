@@ -31,6 +31,8 @@ GLOBAL HMODULE hSelf; // A handle to ourself, to prevent being unloaded
 GLOBAL void** initterm_eReference; // A pointer-pointer to a function which is run extremely soon after starting, or after being unpacked
 GETTER_VAR(void*, initterm_e); // A pointer to that function
 
+#include "../CommandsWrapper.h"
+
 #include "callbacks/ChatHandler.h"
 #include "callbacks/P2PRequestHandler.h"
 #include "callbacks/CheckInventoryFullHandler.h"

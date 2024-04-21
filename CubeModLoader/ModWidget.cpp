@@ -54,11 +54,11 @@ void mod::ModWidget::MouseUp(cube::MouseButton mouse_button)
 	{
 		return;
 	}
-
 	switch (this->hover_state)
 	{
 	case HoverState::Exit:
 		this->node->SetVisibility(false);
+		this->game->gui.startmenu_node->display->SetVisibility(this->game->gui.startmenu_node->display->visibility.current_frame, 1);
 		if (this->changed)
 		{
 			// Restart the game

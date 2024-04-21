@@ -21,6 +21,7 @@ namespace mod {
 		int page;
 		bool changed;
 		plasma::Node* background;
+		plasma::Node* button;
 		std::vector<DLL*>* mods;
 		void* artificial_vtable[43];
 
@@ -30,7 +31,7 @@ namespace mod {
 		bool NextPageAvailable();
 		bool PreviousPageAvailable();
 
-		static void test(uint64_t value);
+		static void ModTogglePressed(uint64_t value);
 
 		static void Draw(ModWidget* widget);
 		static void Init();

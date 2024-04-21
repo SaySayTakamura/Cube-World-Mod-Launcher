@@ -28,13 +28,15 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 
 	// test button
 
-	void(*test_func)(uint64_t) = test;
+	void(*test_func)(uint64_t) = ModTogglePressed;
 	std::wstring wstr_node_name(L"test-mod-node");
-	std::wstring wstr_node_text(L"test text");
+	std::wstring wstr_node_text(L"Enable");
+	FloatVector2 size(100, 60);
 	IntVector2 pos(0, 500);
-	IntVector2 off(250, 100);
-	plasma::Node* test_button = plasma::Node::CreateButton(game->plasma_engine->root_node, &wstr_node_name, 1, &wstr_node_text, &pos, &off);
-	test_button->SetCallback(2, test_func, 1, 1);
+	IntVector2 off(0, 0);
+	this->button = plasma::Node::CreateButton(this->node, &wstr_node_name, 0, &wstr_node_text, &pos, &off);
+	this->button->SetCallback(2, test_func, 1, 1);
+	this->button->widget1->SetSize(&size);
 
 	for (int i = 0; i < 43; ++i)
 	{
@@ -58,7 +60,6 @@ void mod::ModWidget::MouseUp(cube::MouseButton mouse_button)
 	{
 	case HoverState::Exit:
 		this->node->SetVisibility(false);
-		this->game->gui.startmenu_node->display->SetVisibility(this->game->gui.startmenu_node->display->visibility.current_frame, 1);
 		if (this->changed)
 		{
 			// Restart the game
@@ -103,7 +104,7 @@ bool mod::ModWidget::PreviousPageAvailable()
 	return this->page > 0;
 }
 
-void mod::ModWidget::test(uint64_t value)
+void mod::ModWidget::ModTogglePressed(uint64_t value)
 {
 	auto game = cube::GetGame();
 	wchar_t buffer[250];
@@ -134,6 +135,9 @@ void mod::ModWidget::Draw(ModWidget* widget)
 	std::wstring wstr_next(L">");
 	std::wstring wstr_prev(L"<");
 	std::wstring wstr_x(L"X");
+
+	std::wstring wstr_enable(L"Enable");
+	std::wstring wstr_disable(L"Disable");
 
 	// Translate background and node
 	widget->node->Translate(game->width/2, game->height/2, -size.x/2, -size.y/2);
@@ -183,24 +187,31 @@ void mod::ModWidget::Draw(ModWidget* widget)
 		DLL* dll = widget->mods->at(i);
 		widget->SetTextPivot(plasma::TextPivot::Left);
 		widget->SetTextColor(&text_color);
+
+		widget->button->SetText(&wstr_disable);
 		if (!dll->enabled)
 		{
 			widget->SetTextColor(&disabled_color);
+			widget->button->SetText(&wstr_enable);
 		}
 
 		int y_pos = (4 + 2 * y_count) * (10 + text_size);
-		if (plasma::Widget::IsSquareHovered(&mouse_pos, 0, y_pos - 20, size.x, 30))
+		if (plasma::Widget::IsSquareHovered(&mouse_pos, 0, y_pos - 20, size.x, 50))
 		{
 			widget->SetTextColor(&hover_color);
 			widget->hover_state = HoverState::Toggle;
 			widget->selected = i;
+			widget->button->Translate((game->width/2 + 150) / game->gui.scale, ((game->height/2) + y_pos) / game->gui.scale);
 		}
 		std::wstring name = L"- " + std::wstring(dll->fileName.begin() + 5, dll->fileName.end());
+		std::wstring desc = L"" + std::wstring(L"This is a description :D");
 		if (name.size() > 45)
 		{
 			name = name.substr(0, 42) + L"...";
 		}
 		widget->DrawString(&pos, &name, 20, y_pos);
+		widget->SetTextColor(&disabled_color);
+		widget->DrawString(&pos, &desc, 50, y_pos+20);
 
 		y_count++;
 		if (y_pos > size.y - 2 * (10 + text_size))

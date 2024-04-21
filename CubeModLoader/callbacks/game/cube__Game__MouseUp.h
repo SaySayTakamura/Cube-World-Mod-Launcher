@@ -42,7 +42,6 @@ extern "C" void cube__Game__MouseUp(cube::Game* game, cube::MouseButton mouse_bu
 				break;
 			case cube::StartMenuWidget::HoverState::Mods:
 				mod_node->SetVisibility(true);
-				game->gui.startmenu_node->display->SetVisibility(game->gui.startmenu_node->display->visibility.current_frame, 0);
 				break;
 			case cube::StartMenuWidget::HoverState::None:
 			default:

@@ -11,8 +11,6 @@ public:
 		VeryLowPriority = 4
 	};
 
-	CommandsManager cmd_manager = CommandsManager();
-
 	virtual void Initialize() {}
 
 	Priority OnChatPriority = NormalPriority;

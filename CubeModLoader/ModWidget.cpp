@@ -26,6 +26,16 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 	this->SetScalableFont(&fontName);
 	this->Translate(100, 200, 1);
 
+	// test button
+
+	void(*test_func)(uint64_t) = test;
+	std::wstring wstr_node_name(L"test-mod-node");
+	std::wstring wstr_node_text(L"test text");
+	IntVector2 pos(0, 500);
+	IntVector2 off(250, 100);
+	plasma::Node* test_button = plasma::Node::CreateButton(game->plasma_engine->root_node, &wstr_node_name, 1, &wstr_node_text, &pos, &off);
+	test_button->SetCallback(2, test_func, 1, 1);
+
 	for (int i = 0; i < 43; ++i)
 	{
 		this->artificial_vtable[i] = VTABLE[i];
@@ -91,6 +101,14 @@ bool mod::ModWidget::NextPageAvailable()
 bool mod::ModWidget::PreviousPageAvailable()
 {
 	return this->page > 0;
+}
+
+void mod::ModWidget::test(uint64_t value)
+{
+	auto game = cube::GetGame();
+	wchar_t buffer[250];
+	swprintf_s(buffer, 250, L"Button pressed with value: %d ", value);
+	game->PrintMessage(buffer);
 }
 
 void mod::ModWidget::Draw(ModWidget* widget)

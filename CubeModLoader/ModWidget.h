@@ -24,12 +24,20 @@ namespace mod {
 		std::vector<DLL*>* mods;
 		void* artificial_vtable[43];
 
+		plasma::Node* test_node_1;
+		plasma::Node* test_node_2;
+		plasma::Node* test_node_3;
+		plasma::Node* test_node_4;
+		plasma::Node* test_node_5;
+		plasma::Node* test_node_6;
 
 		ModWidget* ctor(cube::Game* game, plasma::Node* node, plasma::Node* background, std::vector<DLL*>* mods);
 
 		void MouseUp(cube::MouseButton mouse_button);
 		bool NextPageAvailable();
 		bool PreviousPageAvailable();
+
+		static void test(uint64_t value);
 
 		static void Draw(ModWidget* widget);
 		static void Init();

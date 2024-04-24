@@ -2,6 +2,10 @@
 #include "../../CWSDK/cwsdk.h"
 #include "../ModWidget.h"
 
+bool isStartMenuWidgetsAreOpen(cube::Game* game, plasma::Node* mod_node) {
+	return game->gui.options_widget->node->display->IsVisible() || mod_node->display->IsVisible();
+}
+
 extern "C" void cube__Game__MouseUp(cube::Game* game, cube::MouseButton mouse_button)
 {
 	std::wstring wstr_mod_node(L"mod-node");
@@ -23,6 +27,7 @@ extern "C" void cube__Game__MouseUp(cube::Game* game, cube::MouseButton mouse_bu
 				game->shutdown = 1;
 				break;
 			case cube::StartMenuWidget::HoverState::Continue:
+				if (isStartMenuWidgetsAreOpen(game, mod_node)) break;
 				game->MaybeLoadCharacter(game->current_character_slot, game->GetPlayer());
 				game->gui.startmenu_node->display->SetVisibility(game->gui.startmenu_node->display->visibility.current_frame, 0);
 				game->target_camera_distance = 8.0f;
@@ -34,13 +39,16 @@ extern "C" void cube__Game__MouseUp(cube::Game* game, cube::MouseButton mouse_bu
 				game->world->CW_2E0B50();
 				break;
 			case cube::StartMenuWidget::HoverState::Options:
+				if (isStartMenuWidgetsAreOpen(game, mod_node)) break;
 				game->gui.options_widget->node->display->SetVisibility(game->gui.options_widget->node->display->visibility.current_frame, 1);
 				break;
 			case cube::StartMenuWidget::HoverState::StartGame:
+				if (isStartMenuWidgetsAreOpen(game, mod_node)) break;
 				game->gui.startmenu_node->display->SetVisibility(game->gui.startmenu_node->display->visibility.current_frame, 0);
 				game->gui.character_selection_node->display->SetVisibility(game->gui.character_selection_node->display->visibility.current_frame, 1);
 				break;
 			case cube::StartMenuWidget::HoverState::Mods:
+				if (isStartMenuWidgetsAreOpen(game, mod_node)) break;
 				mod_node->SetVisibility(true);
 				break;
 			case cube::StartMenuWidget::HoverState::None:

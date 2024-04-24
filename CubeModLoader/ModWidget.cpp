@@ -112,11 +112,36 @@ void mod::ModWidget::ModTogglePressed(uint64_t value)
 	game->PrintMessage(buffer);
 }
 
+std::wstring* mod::ModWidget::GetSlicedModDescription(std::wstring* str)
+{
+	const static int line_length = 25;
+	int last_space = -1;
+	int i_offset = 0;
+	std::wstring* final_string(str);
+	std::wstring new_line(L"\n");
+
+	for (int index = 0; index < str->size(); index++) {
+		const wchar_t* c = str->c_str();
+		if (wcsncmp(&c[index], L" ", 1) == 0) {
+			last_space = index;
+		}
+
+		if (index-i_offset > line_length) {
+			if (last_space == -1) last_space = index;
+			final_string->replace(last_space, 1, new_line);
+			i_offset = last_space;
+		}
+	}
+
+	return final_string;
+}
+// L"This is a template description to test if the wrapping is working fine and a lot of wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
 void mod::ModWidget::Draw(ModWidget* widget)
 {
 	const static float text_size = 18.0f; // Original	18.0f
 	const static float border_size = 4.0f; // Original	4.0f
 	const static float title_size = 25.0f;
+	const static float text_offset = 10.0f;
 
 	cube::Game* game = widget->game;
 
@@ -195,26 +220,28 @@ void mod::ModWidget::Draw(ModWidget* widget)
 			widget->button->SetText(&wstr_enable);
 		}
 
-		int y_pos = (4 + 2 * y_count) * (10 + text_size);
+		int y_pos = (4 + y_count) * (text_offset + text_size) * 2;
 		if (plasma::Widget::IsSquareHovered(&mouse_pos, 0, y_pos - 20, size.x, 50))
 		{
 			widget->SetTextColor(&hover_color);
 			widget->hover_state = HoverState::Toggle;
 			widget->selected = i;
-			widget->button->Translate((game->width/2 + 150) / game->gui.scale, ((game->height/2) + y_pos) / game->gui.scale);
+			widget->button->Translate((game->width/2 + 150) / game->gui.scale, game->height/4 + y_pos);
 		}
 		std::wstring name = L"- " + std::wstring(dll->fileName.begin() + 5, dll->fileName.end());
-		std::wstring desc = L"" + std::wstring(L"This is a description :D");
+		std::wstring temp_desc = std::wstring(L"This is a template description to test if the wrapping is working fine and a lot of nothing.");
+		std::wstring* desc = widget->GetSlicedModDescription(&temp_desc);
+
 		if (name.size() > 45)
 		{
 			name = name.substr(0, 42) + L"...";
 		}
 		widget->DrawString(&pos, &name, 20, y_pos);
 		widget->SetTextColor(&disabled_color);
-		widget->DrawString(&pos, &desc, 50, y_pos+20);
+		widget->DrawString(&pos, desc, 50, y_pos+20);
 
 		y_count++;
-		if (y_pos > size.y - 2 * (10 + text_size))
+		if (y_pos > size.y - (text_offset + text_size) * 2)
 		{
 			break;
 		}

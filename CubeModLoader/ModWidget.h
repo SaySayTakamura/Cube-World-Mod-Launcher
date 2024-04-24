@@ -33,6 +33,8 @@ namespace mod {
 
 		static void ModTogglePressed(uint64_t value);
 
+		std::wstring* GetSlicedModDescription(std::wstring* str);
+
 		static void Draw(ModWidget* widget);
 		static void Init();
 		static void LoadSave(std::vector<DLL*>* mods);

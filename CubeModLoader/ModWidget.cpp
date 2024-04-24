@@ -29,8 +29,8 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 	// test button
 
 	void(*test_func)(uint64_t) = ModTogglePressed;
-	std::wstring wstr_node_name(L"test-mod-node");
-	std::wstring wstr_node_text(L"Enable");
+	std::wstring wstr_node_name(L"mod-toggle-node");
+	std::wstring wstr_node_text(L"");
 	FloatVector2 size(100, 60);
 	IntVector2 pos(0, 500);
 	IntVector2 off(0, 0);
@@ -68,13 +68,6 @@ void mod::ModWidget::MouseUp(cube::MouseButton mouse_button)
 		}
 		break;
 	case HoverState::Toggle:
-		if (this->selected < 0 || this->selected >= this->mods->size())
-		{
-			return;
-		}
-		this->mods->at(this->selected)->enabled = !this->mods->at(this->selected)->enabled;
-		ModWidget::StoreSave(this->mods);
-		this->changed = true;
 		break;
 	case HoverState::Next:
 		if (this->NextPageAvailable())
@@ -107,21 +100,29 @@ bool mod::ModWidget::PreviousPageAvailable()
 void mod::ModWidget::ModTogglePressed(uint64_t value)
 {
 	auto game = cube::GetGame();
-	wchar_t buffer[250];
-	swprintf_s(buffer, 250, L"Button pressed with value: %d ", value);
-	game->PrintMessage(buffer);
+	std::wstring wstr_mod_node(L"mod-node");
+	plasma::Node* mod_node = game->plasma_engine->root_node->FindChildByName(&wstr_mod_node);
+	
+	if (mod_node == nullptr) return;
+	mod::ModWidget * widget = (mod::ModWidget *)mod_node->widget1;
+
+	if (widget->selected < 0 || widget->selected >= widget->mods->size()) return;
+
+	widget->mods->at(widget->selected)->enabled = !widget->mods->at(widget->selected)->enabled;
+	ModWidget::StoreSave(widget->mods);
+	widget->changed = true;
 }
 
 std::wstring* mod::ModWidget::GetSlicedModDescription(std::wstring* str)
 {
-	const static int line_length = 25;
+	const static int line_length = 32;
 	int last_space = -1;
 	int i_offset = 0;
 	std::wstring* final_string(str);
 	std::wstring new_line(L"\n");
 
+	const wchar_t* c = str->c_str();
 	for (int index = 0; index < str->size(); index++) {
-		const wchar_t* c = str->c_str();
 		if (wcsncmp(&c[index], L" ", 1) == 0) {
 			last_space = index;
 		}
@@ -135,20 +136,37 @@ std::wstring* mod::ModWidget::GetSlicedModDescription(std::wstring* str)
 
 	return final_string;
 }
-// L"This is a template description to test if the wrapping is working fine and a lot of wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww"
+
+int mod::ModWidget::GetDescriptionLines(std::wstring* str)
+{
+	std::wstring new_line(L"\n");
+	int amount = 1;
+	const wchar_t* c = str->c_str();
+
+	for (int index = 0; index < str->size(); index++) {
+		if (wcsncmp(&c[index], new_line.c_str(), 1) == 0) {
+			amount++;
+		}
+	}
+	return amount;
+}
+
 void mod::ModWidget::Draw(ModWidget* widget)
 {
 	const static float text_size = 18.0f; // Original	18.0f
 	const static float border_size = 4.0f; // Original	4.0f
 	const static float title_size = 25.0f;
 	const static float text_offset = 10.0f;
+	const static float desc_offset = 20.0f;
 
 	cube::Game* game = widget->game;
 
 	FloatRGBA text_color(1.0f, 1.0f, 1.0f, 1.0f);
 	FloatRGBA hover_color(0.2f, 1.0f, 1.0f, 1.0f);
 	FloatRGBA warn_color(1.0f, 0.65f, 0.0f, 1.0f);
+	FloatRGBA desc_color(0.5f, 0.5f, 1.0f, 1.0f);
 	FloatRGBA disabled_color(1.0f, 1.0f, 1.0f, 0.2f);
+	FloatRGBA disabled_desc_color(0.5f, 0.5f, 1.0f, 0.5f);
 	FloatRGBA border_color(0.0f, 0.0f, 0.0f, 1.0f);
 
 	FloatVector2 mouse_pos;
@@ -206,40 +224,60 @@ void mod::ModWidget::Draw(ModWidget* widget)
 
 	// Draw mods
 	int y_count = 0;
+	int current_height = 0;
 
+	widget->button->SetVisibility(false);
 	for (int i = widget->page * 7; i < (widget->page + 1)*7 && i < widget->mods->size(); i++)
 	{
 		DLL* dll = widget->mods->at(i);
-		widget->SetTextPivot(plasma::TextPivot::Left);
-		widget->SetTextColor(&text_color);
-
-		widget->button->SetText(&wstr_disable);
+		FloatRGBA* name_color_ptr = &text_color;
+		FloatRGBA* desc_color_ptr = &desc_color;
 		if (!dll->enabled)
 		{
-			widget->SetTextColor(&disabled_color);
-			widget->button->SetText(&wstr_enable);
+			name_color_ptr = &disabled_color;
+			desc_color_ptr = &disabled_desc_color;
 		}
 
-		int y_pos = (4 + y_count) * (text_offset + text_size) * 2;
-		if (plasma::Widget::IsSquareHovered(&mouse_pos, 0, y_pos - 20, size.x, 50))
-		{
-			widget->SetTextColor(&hover_color);
-			widget->hover_state = HoverState::Toggle;
-			widget->selected = i;
-			widget->button->Translate((game->width/2 + 150) / game->gui.scale, game->height/4 + y_pos);
-		}
-		std::wstring name = L"- " + std::wstring(dll->fileName.begin() + 5, dll->fileName.end());
+		int y_pos = 4 * (text_offset + text_size) + current_height;
 		std::wstring temp_desc = std::wstring(L"This is a template description to test if the wrapping is working fine and a lot of nothing.");
 		std::wstring* desc = widget->GetSlicedModDescription(&temp_desc);
+		int desc_height = widget->GetDescriptionLines(desc) * text_size;
+		int mod_height = desc_offset + desc_height;
+		widget->SetTextPivot(plasma::TextPivot::Center);
+		if (plasma::Widget::IsSquareHovered(&mouse_pos, 0, y_pos - 20, size.x, mod_height-1)) // this -1 is avoiding overlaping on two mods at the same time
+		{
+			// Print text inside of the button 'disable' or 'enable'
+			// Since button node does not change text position based on button size.
+			widget->SetTextColor(&text_color);
+			if (!dll->enabled) {
+				widget->DrawString(&pos, &wstr_enable, 450, y_pos + 30);
+			}
+			else {
+				widget->DrawString(&pos, &wstr_disable, 450, y_pos + 30);
+			}
+
+			widget->button->SetVisibility(true);
+			widget->button->Translate((game->width/2 + 150) / game->gui.scale, (game->height/4) / game->gui.scale + y_pos);
+
+			name_color_ptr = &hover_color;
+			desc_color_ptr = &desc_color;
+			widget->hover_state = HoverState::Toggle;
+			widget->selected = i;
+		}
+		widget->SetTextPivot(plasma::TextPivot::Left);
+		std::wstring name = L"- " + std::wstring(dll->fileName.begin() + 5, dll->fileName.end());
 
 		if (name.size() > 45)
 		{
 			name = name.substr(0, 42) + L"...";
 		}
-		widget->DrawString(&pos, &name, 20, y_pos);
-		widget->SetTextColor(&disabled_color);
-		widget->DrawString(&pos, desc, 50, y_pos+20);
 
+		widget->SetTextColor(name_color_ptr);
+		widget->DrawString(&pos, &name, 20, y_pos);
+		widget->SetTextColor(desc_color_ptr);
+		widget->DrawString(&pos, desc, 50, y_pos+desc_offset);
+
+		current_height += mod_height;
 		y_count++;
 		if (y_pos > size.y - (text_offset + text_size) * 2)
 		{

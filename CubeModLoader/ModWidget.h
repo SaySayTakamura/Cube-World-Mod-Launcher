@@ -34,6 +34,7 @@ namespace mod {
 		static void ModTogglePressed(uint64_t value);
 
 		std::wstring* GetSlicedModDescription(std::wstring* str);
+		int GetDescriptionLines(std::wstring* str);
 
 		static void Draw(ModWidget* widget);
 		static void Init();

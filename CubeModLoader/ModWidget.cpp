@@ -240,9 +240,11 @@ void mod::ModWidget::Draw(ModWidget* widget)
 
 		int y_pos = 4 * (text_offset + text_size) + current_height;
 		std::wstring temp_desc = std::wstring(L"This is a template description to test if the wrapping is working fine and a lot of nothing.");
+		temp_desc.append(std::to_wstring(game->gui.scale));
 		std::wstring* desc = widget->GetSlicedModDescription(&temp_desc);
 		int desc_height = widget->GetDescriptionLines(desc) * text_size;
-		int mod_height = desc_offset + desc_height;
+		int mod_height = max(35, desc_offset + desc_height);
+
 		widget->SetTextPivot(plasma::TextPivot::Center);
 		if (plasma::Widget::IsSquareHovered(&mouse_pos, 0, y_pos - 20, size.x, mod_height-1)) // this -1 is avoiding overlaping on two mods at the same time
 		{
@@ -250,14 +252,14 @@ void mod::ModWidget::Draw(ModWidget* widget)
 			// Since button node does not change text position based on button size.
 			widget->SetTextColor(&text_color);
 			if (!dll->enabled) {
-				widget->DrawString(&pos, &wstr_enable, 450, y_pos + 30);
+				widget->DrawString(&pos, &wstr_enable, 450, y_pos + max(35, desc_height) / 2);
 			}
 			else {
-				widget->DrawString(&pos, &wstr_disable, 450, y_pos + 30);
+				widget->DrawString(&pos, &wstr_disable, 450, y_pos + max(35, desc_height) / 2);
 			}
 
 			widget->button->SetVisibility(true);
-			widget->button->Translate((game->width/2 + 150) / game->gui.scale, (game->height/4) / game->gui.scale + y_pos);
+			widget->button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 400, -size.y / 2 + y_pos - 36 + max(35, desc_height) / 2);
 
 			name_color_ptr = &hover_color;
 			desc_color_ptr = &desc_color;

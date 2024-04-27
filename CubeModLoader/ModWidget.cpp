@@ -18,7 +18,8 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 	this->hover_state = 0;
 	this->background = background;
 	this->mods = mods;
-	this->page = 0;
+	this->scroll_value = 0;
+	this->max_height = 0;
 	this->changed = false;
 
 	// Set scalable font
@@ -26,18 +27,41 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 	this->SetScalableFont(&fontName);
 	this->Translate(100, 200, 1);
 
-	// test button
-
-	void(*test_func)(uint64_t) = ModTogglePressed;
+	// Toggle mod button
+	void(*mod_toggle)(uint64_t) = ModTogglePressed;
 	std::wstring wstr_node_name(L"mod-toggle-node");
 	std::wstring wstr_node_text(L"");
 	FloatVector2 size(100, 60);
 	IntVector2 pos(0, 500);
 	IntVector2 off(0, 0);
 	this->button = plasma::Node::CreateButton(this->node, &wstr_node_name, 0, &wstr_node_text, &pos, &off);
-	this->button->SetCallback(2, test_func, 1, 1);
+	this->button->SetCallback(2, mod_toggle, 1, 1);
 	this->button->widget1->SetSize(&size);
 
+	// Create scroll bar buttons
+	void(*scroll_up)(uint64_t) = ScrollUp;
+	void(*scroll_down)(uint64_t) = ScrollDown;
+	//void(*mod_toggle)(uint64_t) = ModTogglePressed;
+	const std::wstring wstr_upbutton(L"upbutton");
+	plasma::Node* up_button = game->plasma_engine->root_node->FindChildByName(&wstr_upbutton);
+	if (up_button != nullptr) {
+		this->up_button = up_button->CreateDeepCopy(this->node);
+	}
+	const std::wstring wstr_downbutton(L"downbutton");
+	plasma::Node* down_button = game->plasma_engine->root_node->FindChildByName(&wstr_downbutton);
+	if (down_button != nullptr) {
+		this->down_button = down_button->CreateDeepCopy(this->node);
+	}
+	const std::wstring wstr_scrollbutton(L"scrollbutton");
+	plasma::Node* scroll_button = game->plasma_engine->root_node->FindChildByName(&wstr_scrollbutton);
+	if (scroll_button != nullptr) {
+		this->scroll_button = scroll_button->CreateDeepCopy(this->node);
+	}
+
+	this->up_button->SetCallback(2, scroll_up, 1, 1);
+	this->down_button->SetCallback(2, scroll_down, 1, 1);
+
+	// Fill the artificial vtable
 	for (int i = 0; i < 43; ++i)
 	{
 		this->artificial_vtable[i] = VTABLE[i];
@@ -69,42 +93,16 @@ void mod::ModWidget::MouseUp(cube::MouseButton mouse_button)
 		break;
 	case HoverState::Toggle:
 		break;
-	case HoverState::Next:
-		if (this->NextPageAvailable())
-		{
-			this->page++;
-		}
-		break;
-	case HoverState::Previous:
-		if (this->PreviousPageAvailable())
-		{
-			this->page--;
-		}
-		break;
 	default:
 
 		break;
 	}
 }
 
-bool mod::ModWidget::NextPageAvailable()
-{
-	return (this->page + 1) * MODS_PER_PAGE < this->mods->size();
-}
-
-bool mod::ModWidget::PreviousPageAvailable()
-{
-	return this->page > 0;
-}
-
 void mod::ModWidget::ModTogglePressed(uint64_t value)
 {
-	auto game = cube::GetGame();
-	std::wstring wstr_mod_node(L"mod-node");
-	plasma::Node* mod_node = game->plasma_engine->root_node->FindChildByName(&wstr_mod_node);
-	
-	if (mod_node == nullptr) return;
-	mod::ModWidget * widget = (mod::ModWidget *)mod_node->widget1;
+	mod::ModWidget* widget = mod::ModWidget::GetModWidget();
+	if (widget == nullptr) return;
 
 	if (widget->selected < 0 || widget->selected >= widget->mods->size()) return;
 
@@ -113,9 +111,42 @@ void mod::ModWidget::ModTogglePressed(uint64_t value)
 	widget->changed = true;
 }
 
+void mod::ModWidget::ScrollUp(uint64_t value)
+{
+	mod::ModWidget* widget = mod::ModWidget::GetModWidget();
+	if (widget == nullptr) return;
+
+	widget->scroll_value--;
+	if (widget->scroll_value < 0) {
+		widget->scroll_value = 0;
+	}
+}
+
+void mod::ModWidget::ScrollDown(uint64_t value)
+{
+	mod::ModWidget* widget = mod::ModWidget::GetModWidget();
+	if (widget == nullptr) return;
+
+	widget->scroll_value++;
+	if (widget->scroll_value >= widget->mods->size()) {
+		widget->scroll_value = widget->mods->size()-1;
+	}
+}
+
+mod::ModWidget* mod::ModWidget::GetModWidget()
+{
+	auto game = cube::GetGame();
+	std::wstring wstr_mod_node(L"mod-node");
+	plasma::Node* mod_node = game->plasma_engine->root_node->FindChildByName(&wstr_mod_node);
+
+	if (mod_node == nullptr) return nullptr;
+	mod::ModWidget* widget = (mod::ModWidget*)mod_node->widget1;
+	return widget;
+}
+
 std::wstring* mod::ModWidget::GetSlicedModDescription(std::wstring* str)
 {
-	const static int line_length = 32;
+	const static int line_length = 27;
 	int last_space = -1;
 	int i_offset = 0;
 	std::wstring* final_string(str);
@@ -172,6 +203,7 @@ void mod::ModWidget::Draw(ModWidget* widget)
 	FloatVector2 mouse_pos;
 	FloatVector2 pos(0, 0);
 	FloatVector2 size(500, 500);
+	FloatVector2 scroll_size(16, 340);
 
 	std::wstring wstr_title(L"Mods");
 	std::wstring wstr_reminder(L"If you change something \n the game restarts to \n reload all the mods!");
@@ -185,6 +217,10 @@ void mod::ModWidget::Draw(ModWidget* widget)
 	// Translate background and node
 	widget->node->Translate(game->width/2, game->height/2, -size.x/2, -size.y/2);
 	widget->background->Translate(game->width / 2, game->height / 2, -size.x / 2, -size.y / 2);
+	widget->up_button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 475, -size.y / 2 + 50);
+	widget->down_button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 475, -size.y / 2 + 450);
+	widget->scroll_button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 485, -size.y / 2 + 85);
+	widget->scroll_button->widget1->SetSize(&scroll_size);
 
 	// Scale background and node
 	widget->SetSize(&size);
@@ -225,9 +261,12 @@ void mod::ModWidget::Draw(ModWidget* widget)
 	// Draw mods
 	int y_count = 0;
 	int current_height = 0;
+	widget->max_height = 1;
+
+	int empty_space = 0;
 
 	widget->button->SetVisibility(false);
-	for (int i = widget->page * 7; i < (widget->page + 1)*7 && i < widget->mods->size(); i++)
+	for (int i = 0; i < widget->mods->size(); i++)
 	{
 		DLL* dll = widget->mods->at(i);
 		FloatRGBA* name_color_ptr = &text_color;
@@ -245,6 +284,12 @@ void mod::ModWidget::Draw(ModWidget* widget)
 		int desc_height = widget->GetDescriptionLines(desc) * text_size;
 		int mod_height = max(35, desc_offset + desc_height);
 
+		widget->max_height += mod_height;
+
+		if (y_pos + mod_height > size.y || i < widget->scroll_value) {
+			continue;
+		}
+
 		widget->SetTextPivot(plasma::TextPivot::Center);
 		if (plasma::Widget::IsSquareHovered(&mouse_pos, 0, y_pos - 20, size.x, mod_height-1)) // this -1 is avoiding overlaping on two mods at the same time
 		{
@@ -252,14 +297,14 @@ void mod::ModWidget::Draw(ModWidget* widget)
 			// Since button node does not change text position based on button size.
 			widget->SetTextColor(&text_color);
 			if (!dll->enabled) {
-				widget->DrawString(&pos, &wstr_enable, 450, y_pos + max(35, desc_height) / 2);
+				widget->DrawString(&pos, &wstr_enable, 415, y_pos + max(35, desc_height) / 2);
 			}
 			else {
-				widget->DrawString(&pos, &wstr_disable, 450, y_pos + max(35, desc_height) / 2);
+				widget->DrawString(&pos, &wstr_disable, 415, y_pos + max(35, desc_height) / 2);
 			}
 
 			widget->button->SetVisibility(true);
-			widget->button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 400, -size.y / 2 + y_pos - 36 + max(35, desc_height) / 2);
+			widget->button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 365, -size.y / 2 + y_pos - 36 + max(35, desc_height) / 2);
 
 			name_color_ptr = &hover_color;
 			desc_color_ptr = &desc_color;
@@ -281,45 +326,16 @@ void mod::ModWidget::Draw(ModWidget* widget)
 
 		current_height += mod_height;
 		y_count++;
-		if (y_pos > size.y - (text_offset + text_size) * 2)
-		{
-			break;
-		}
+		empty_space = max(size.y - current_height, 0);
 	}
 
-	// Draw prev button
-	widget->SetTextColor(&text_color);
-	if (!widget->PreviousPageAvailable())
-	{
-		widget->SetTextColor(&disabled_color);
+	// Sorry Nichiren you did an amazing job, but i have to replace this :]
+	if (y_count < widget->mods->size() || widget->scroll_value > 0) { // if all the mods are not rendered on screen
+		// Apply Transformation and Size modification to ScrollBar here!
+		widget->scroll_button->widget1->SetSize(scroll_size.x, (size.y / (widget->max_height+empty_space))*scroll_size.y);
+		int scroll_pos = ((scroll_size.y) / (widget->mods->size()));
+		widget->scroll_button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 485, -size.y / 2 + 85 + scroll_pos * widget->scroll_value);
 	}
-	else if (plasma::Widget::IsSquareHovered(&mouse_pos, 20, size.y - text_size - 20, 20, 30))
-	{
-		widget->hover_state = HoverState::Previous;
-		widget->SetTextColor(&hover_color);
-	}
-	widget->DrawString(&pos, &wstr_prev, 20, size.y - text_size);
-
-	// Draw next button
-	widget->SetTextPivot(plasma::TextPivot::Right);
-	widget->SetTextColor(&text_color);
-
-	if (!widget->NextPageAvailable())
-	{
-		widget->SetTextColor(&disabled_color);
-	}
-	else if (plasma::Widget::IsSquareHovered(&mouse_pos, size.x - text_size - 20, size.y - text_size - 20, 20, 30))
-	{
-		widget->hover_state = HoverState::Next;
-		widget->SetTextColor(&hover_color);
-	}
-	widget->DrawString(&pos, &wstr_next, size.x - 20, size.y - text_size);
-
-	// Draw current page
-	widget->SetTextColor(&text_color);
-	widget->SetTextPivot(plasma::TextPivot::Center);
-	std::wstring page = std::to_wstring(widget->page + 1) + L"/" + std::to_wstring((int)(widget->mods->size() / MODS_PER_PAGE) + 1);
-	widget->DrawString(&pos, &page, size.x / 2, size.y - text_size);
 }
 
 void mod::ModWidget::Init()

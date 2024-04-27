@@ -18,20 +18,25 @@ namespace mod {
 		cube::Game* game;
 		int hover_state;
 		int selected;
-		int page;
+		int scroll_value;
+		int max_height;
 		bool changed;
 		plasma::Node* background;
-		plasma::Node* button;
+		plasma::Node* button; // ToggleButton
+		plasma::Node* up_button;
+		plasma::Node* down_button;
+		plasma::Node* scroll_button;
 		std::vector<DLL*>* mods;
 		void* artificial_vtable[43];
 
 		ModWidget* ctor(cube::Game* game, plasma::Node* node, plasma::Node* background, std::vector<DLL*>* mods);
 
 		void MouseUp(cube::MouseButton mouse_button);
-		bool NextPageAvailable();
-		bool PreviousPageAvailable();
 
 		static void ModTogglePressed(uint64_t value);
+		static void ScrollUp(uint64_t value);
+		static void ScrollDown(uint64_t value);
+		static mod::ModWidget* GetModWidget();
 
 		std::wstring* GetSlicedModDescription(std::wstring* str);
 		int GetDescriptionLines(std::wstring* str);

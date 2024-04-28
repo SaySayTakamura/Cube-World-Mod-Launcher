@@ -21,6 +21,7 @@ namespace mod {
 		int scroll_value;
 		int max_height;
 		bool changed;
+		bool reached_end;
 		plasma::Node* background;
 		plasma::Node* button; // ToggleButton
 		plasma::Node* up_button;
@@ -28,6 +29,8 @@ namespace mod {
 		plasma::Node* scroll_button;
 		std::vector<DLL*>* mods;
 		void* artificial_vtable[43];
+
+		constexpr static float desc_offset = 20.0f;
 
 		ModWidget* ctor(cube::Game* game, plasma::Node* node, plasma::Node* background, std::vector<DLL*>* mods);
 
@@ -37,6 +40,8 @@ namespace mod {
 		static void ScrollUp(uint64_t value);
 		static void ScrollDown(uint64_t value);
 		static mod::ModWidget* GetModWidget();
+		int GetModHeight(DLL* dll, int text_size);
+		int GetModDescriptionHeight(DLL* dll, int text_size);
 
 		std::wstring* GetSlicedModDescription(std::wstring* str);
 		int GetDescriptionLines(std::wstring* str);

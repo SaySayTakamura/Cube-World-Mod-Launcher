@@ -21,6 +21,7 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 	this->scroll_value = 0;
 	this->max_height = 0;
 	this->changed = false;
+	this->reached_end = false;
 
 	// Set scalable font
 	std::wstring fontName(L"resource1.dat");
@@ -128,8 +129,8 @@ void mod::ModWidget::ScrollDown(uint64_t value)
 	if (widget == nullptr) return;
 
 	widget->scroll_value++;
-	if (widget->scroll_value >= widget->mods->size()) {
-		widget->scroll_value = widget->mods->size()-1;
+	if (widget->scroll_value >= widget->mods->size() || widget->reached_end) {
+		widget->scroll_value--;
 	}
 }
 
@@ -168,6 +169,16 @@ std::wstring* mod::ModWidget::GetSlicedModDescription(std::wstring* str)
 	return final_string;
 }
 
+int mod::ModWidget::GetModDescriptionHeight(DLL* dll, int text_size) {
+	std::wstring temp_desc = std::wstring(L"This is a template description to test if the wrapping is working fine and a lot of nothing.");
+	std::wstring* desc = this->GetSlicedModDescription(&temp_desc);
+	return this->GetDescriptionLines(desc) * text_size;
+}
+
+int mod::ModWidget::GetModHeight(DLL* dll, int text_size) {
+	return max(35, this->desc_offset + this->GetModDescriptionHeight(dll, text_size));
+}
+
 int mod::ModWidget::GetDescriptionLines(std::wstring* str)
 {
 	std::wstring new_line(L"\n");
@@ -188,7 +199,6 @@ void mod::ModWidget::Draw(ModWidget* widget)
 	const static float border_size = 4.0f; // Original	4.0f
 	const static float title_size = 25.0f;
 	const static float text_offset = 10.0f;
-	const static float desc_offset = 20.0f;
 
 	cube::Game* game = widget->game;
 
@@ -203,7 +213,7 @@ void mod::ModWidget::Draw(ModWidget* widget)
 	FloatVector2 mouse_pos;
 	FloatVector2 pos(0, 0);
 	FloatVector2 size(500, 500);
-	FloatVector2 scroll_size(16, 340);
+	FloatVector2 scroll_size(16, 345);
 
 	std::wstring wstr_title(L"Mods");
 	std::wstring wstr_reminder(L"If you change something \n the game restarts to \n reload all the mods!");
@@ -279,10 +289,9 @@ void mod::ModWidget::Draw(ModWidget* widget)
 
 		int y_pos = 4 * (text_offset + text_size) + current_height;
 		std::wstring temp_desc = std::wstring(L"This is a template description to test if the wrapping is working fine and a lot of nothing.");
-		temp_desc.append(std::to_wstring(game->gui.scale));
 		std::wstring* desc = widget->GetSlicedModDescription(&temp_desc);
-		int desc_height = widget->GetDescriptionLines(desc) * text_size;
-		int mod_height = max(35, desc_offset + desc_height);
+		int desc_height = widget->GetModDescriptionHeight(dll, text_size);
+		int mod_height = widget->GetModHeight(dll, text_size);
 
 		widget->max_height += mod_height;
 
@@ -322,15 +331,17 @@ void mod::ModWidget::Draw(ModWidget* widget)
 		widget->SetTextColor(name_color_ptr);
 		widget->DrawString(&pos, &name, 20, y_pos);
 		widget->SetTextColor(desc_color_ptr);
-		widget->DrawString(&pos, desc, 50, y_pos+desc_offset);
+		widget->DrawString(&pos, desc, 50, y_pos+widget->desc_offset);
 
 		current_height += mod_height;
 		y_count++;
 		empty_space = max(size.y - current_height, 0);
 	}
 
+	widget->reached_end = (y_count + widget->scroll_value >= widget->mods->size());
+
 	// Sorry Nichiren you did an amazing job, but i have to replace this :]
-	if (y_count < widget->mods->size() || widget->scroll_value > 0) { // if all the mods are not rendered on screen
+	if (y_count < widget->mods->size() || widget->scroll_value > 0) { // if all the mods are not rendered on screen at the same time
 		// Apply Transformation and Size modification to ScrollBar here!
 		widget->scroll_button->widget1->SetSize(scroll_size.x, (size.y / (widget->max_height+empty_space))*scroll_size.y);
 		int scroll_pos = ((scroll_size.y) / (widget->mods->size()));

@@ -20,6 +20,9 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 	this->mods = mods;
 	this->scroll_value = 0;
 	this->max_height = 0;
+	this->scrollbar_press_pos = 0;
+	this->scroll_value_offset = 0;
+	this->scrollbar_pressed = false;
 	this->changed = false;
 	this->reached_end = false;
 
@@ -42,6 +45,8 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 	// Create scroll bar buttons
 	void(*scroll_up)(uint64_t) = ScrollUp;
 	void(*scroll_down)(uint64_t) = ScrollDown;
+	void(*scroll_mouse_down)(uint64_t) = ModScrollbarMouseDown;
+	void(*scroll_mouse_up)(uint64_t) = ModScrollbarMouseUp;
 	//void(*mod_toggle)(uint64_t) = ModTogglePressed;
 	const std::wstring wstr_upbutton(L"upbutton");
 	plasma::Node* up_button = game->plasma_engine->root_node->FindChildByName(&wstr_upbutton);
@@ -61,6 +66,8 @@ mod::ModWidget* mod::ModWidget::ctor(cube::Game* game, plasma::Node* node, plasm
 
 	this->up_button->SetCallback(2, scroll_up, 1, 1);
 	this->down_button->SetCallback(2, scroll_down, 1, 1);
+	this->scroll_button->SetCallback(2, scroll_mouse_down, 1, 1);
+	this->scroll_button->SetCallback(3, scroll_mouse_up, 1, 1);
 
 	// Fill the artificial vtable
 	for (int i = 0; i < 43; ++i)
@@ -110,6 +117,26 @@ void mod::ModWidget::ModTogglePressed(uint64_t value)
 	widget->mods->at(widget->selected)->enabled = !widget->mods->at(widget->selected)->enabled;
 	ModWidget::StoreSave(widget->mods);
 	widget->changed = true;
+}
+
+void mod::ModWidget::ModScrollbarMouseDown(uint64_t value)
+{
+	mod::ModWidget* widget = mod::ModWidget::GetModWidget();
+	if (widget == nullptr) return;
+
+	FloatVector2 vec;
+	widget->scrollbar_press_pos = widget->GetRelativeMousePosition(&vec)->y;
+	widget->scrollbar_pressed = true;
+}
+
+void mod::ModWidget::ModScrollbarMouseUp(uint64_t value)
+{
+	mod::ModWidget* widget = mod::ModWidget::GetModWidget();
+	if (widget == nullptr) return;
+
+	widget->scrollbar_pressed = false;
+	widget->scroll_value += widget->scroll_value_offset;
+	widget->scroll_value_offset = 0;
 }
 
 void mod::ModWidget::ScrollUp(uint64_t value)
@@ -295,7 +322,7 @@ void mod::ModWidget::Draw(ModWidget* widget)
 
 		widget->max_height += mod_height;
 
-		if (y_pos + mod_height > size.y || i < widget->scroll_value) {
+		if (y_pos + mod_height > size.y || i < widget->scroll_value + widget->scroll_value_offset) {
 			continue;
 		}
 
@@ -338,14 +365,30 @@ void mod::ModWidget::Draw(ModWidget* widget)
 		empty_space = max(size.y - current_height, 0);
 	}
 
-	widget->reached_end = (y_count + widget->scroll_value >= widget->mods->size());
+	widget->reached_end = (y_count + widget->scroll_value + widget->scroll_value_offset >= widget->mods->size());
+	int scroll_steps = scroll_size.y / widget->mods->size();
 
-	// Sorry Nichiren you did an amazing job, but i have to replace this :]
-	if (y_count < widget->mods->size() || widget->scroll_value > 0) { // if all the mods are not rendered on screen at the same time
-		// Apply Transformation and Size modification to ScrollBar here!
+	// Sorry Nichiren ("thetrueoneshots" on github) you did an amazing job, but i have to replace this :]
+	if (y_count < widget->mods->size() || widget->scroll_value + widget->scroll_value_offset > 0) { // if all the mods are not rendered on screen at the same time
 		widget->scroll_button->widget1->SetSize(scroll_size.x, (size.y / (widget->max_height+empty_space))*scroll_size.y);
-		int scroll_pos = ((scroll_size.y) / (widget->mods->size()));
-		widget->scroll_button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 485, -size.y / 2 + 85 + scroll_pos * widget->scroll_value);
+
+		// Get scroll_value based on mouse position when pressing the scrollbar
+		if (widget->scrollbar_pressed) {
+			int difference = mouse_pos.y - widget->scrollbar_press_pos;
+			int pos = difference;
+			int amount = pos / scroll_steps;
+			widget->scroll_value_offset = amount;
+
+			while (y_count + widget->scroll_value + widget->scroll_value_offset > widget->mods->size()) {
+				widget->scroll_value--;
+			}
+			if (widget->scroll_value + widget->scroll_value_offset <= 0) {
+				widget->scroll_value = -widget->scroll_value_offset;
+			}
+		}
+
+		int scroll_pos = scroll_steps * (widget->scroll_value + widget->scroll_value_offset);
+		widget->scroll_button->Translate(game->width / 2, game->height / 2, -size.x / 2 + 485, -size.y / 2 + 85 + scroll_pos);
 	}
 }
 

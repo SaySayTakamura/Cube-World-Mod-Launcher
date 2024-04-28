@@ -22,6 +22,9 @@ namespace mod {
 		int max_height;
 		bool changed;
 		bool reached_end;
+		bool scrollbar_pressed;
+		int scrollbar_press_pos;
+		int scroll_value_offset;
 		plasma::Node* background;
 		plasma::Node* button; // ToggleButton
 		plasma::Node* up_button;
@@ -37,6 +40,8 @@ namespace mod {
 		void MouseUp(cube::MouseButton mouse_button);
 
 		static void ModTogglePressed(uint64_t value);
+		static void ModScrollbarMouseDown(uint64_t value);
+		static void ModScrollbarMouseUp(uint64_t value);
 		static void ScrollUp(uint64_t value);
 		static void ScrollDown(uint64_t value);
 		static mod::ModWidget* GetModWidget();

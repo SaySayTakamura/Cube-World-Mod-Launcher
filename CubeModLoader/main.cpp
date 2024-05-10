@@ -51,6 +51,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/CreatureManaGenerationCalculatedHandler.h"
 #include "callbacks/ChunkRemeshHandler.h"
 #include "callbacks/ChunkRemeshedHandler.h"
+#include "callbacks/SpriteManagerLoadSpriteHandler.h"
 
 #include "callbacks/gui/cube__StartMenuWidget__Draw.h"
 #include "callbacks/gui/cube__CharacterPreviewWidget__Draw.h"
@@ -62,11 +63,13 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/creature/cube__Creature__OnCreatureDeath.h"
 #include "callbacks/creature/cube__Creature__CanEquipItem.h"
 #include "callbacks/game/cube__Game__MouseUp.h"
+#include "callbacks/game/cube__Game__HandleMouseWheel.h"
 #include "callbacks/game/cube__Game__Update.h"
 #include "callbacks/item/cube__Item__OnGetBuyingPrice.h"
 #include "callbacks/item/cube__Item__OnGetSellingPrice.h"
 #include "callbacks/item/cube__Item__OnGetGoldBagValue.h"
 #include "callbacks/item/cube__Item__OnClassCanWearItem.h"
+#include "callbacks/sprite_manager/cube__SpriteManager__GetItemModelSprite.h"
 
 void SetupHandlers() {
     setup_function(cube__Creature__GetArmor);
@@ -78,11 +81,13 @@ void SetupHandlers() {
     setup_function(cube__StartMenuWidget__Draw);
     //setup_function(cube__CharacterPreviewWidget__Draw);
     setup_function(cube__Game__MouseUp);
+    //setup_function(cube__Game__HandleMouseWheel);
     setup_function(cube__Game__Update);
     setup_function(cube__Item__GetBuyingPrice);
     setup_function(cube__Item__OnGetSellingPrice);
     setup_function(cube__Item__OnGetGoldBagValue);
     setup_function(cube__Item__OnClassCanWearItem);
+    setup_function(cube__SpriteManager__GetItemModelSprite);
 
     // Should be totally reverse engineered if put here.
     // HUGE effort, but might be worth!
@@ -98,6 +103,7 @@ void SetupHandlers() {
 	SetupGetKeyboardStateHandler();
 	SetupGetMouseStateHandler();
 	SetupPresentHandler();
+    SetupLoadSpriteHandler();
 	SetupCreatureCriticalCalculatedHandler();
 	SetupCreatureAttackPowerCalculatedHandler();
 	SetupCreatureSpellPowerCalculatedHandler();

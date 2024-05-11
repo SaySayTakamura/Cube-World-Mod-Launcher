@@ -1105,7 +1105,7 @@ uint64_t GetManaSpiritItemModel(cube::Item* item) {
 	return 3202LL;
 }
 
-uint64_t GetUnknownItemModel(cube::Item* item) {
+uint64_t GetWhistleItemModel(cube::Item* item) {
 	return 2778LL;
 }
 
@@ -1240,8 +1240,8 @@ extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteMan
 		id = GetManaSpiritItemModel(&item);
 		break;
 	}
-	case cube::Item::CategoryType::Unknown: {
-		id = GetUnknownItemModel(&item);
+	case cube::Item::CategoryType::Whistle: {
+		id = GetWhistleItemModel(&item);
 		break;
 	}
 	default:

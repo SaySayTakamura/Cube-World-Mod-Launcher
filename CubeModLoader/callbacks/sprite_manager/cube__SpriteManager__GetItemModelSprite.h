@@ -77,10 +77,10 @@ uint64_t GetWeaponItemModel(cube::Item* item) {
 			result = 847LL + rarity;
 			break;
 		case 7:
-			result = 2307LL;
+			result = 2306LL;
 			break;
 		default:
-			result = rarity + 2002LL + 5 * modifier;
+			result = rarity + 792LL + 5 * modifier;
 			break;
 		}
 		break;
@@ -214,6 +214,10 @@ uint64_t GetWeaponItemModel(cube::Item* item) {
 		break;
 	case 21:
 		result = 3620LL;
+		break;
+	case 22:
+	case 23:
+		result = 0LL;
 		break;
 	default:
 		result = 1106LL;
@@ -512,7 +516,7 @@ uint64_t GetAmuletItemModel(cube::Item* item) {
 	case cube::Item::MaterialType::Silver:
 		return item->modifier % 5 + (4 * (item->modifier % 5) + 1826LL) + rarity;
 	default:
-		return item->modifier % 5 + (4 * (item->modifier % 5) + 449LL) + rarity;
+		return item->modifier % 5 + (4 * (item->modifier % 5 + 449LL)) + rarity;
 	}
 }
 
@@ -521,7 +525,7 @@ uint64_t GetRingItemModel(cube::Item* item) {
 
 	switch (item->material) {
 	case cube::Item::MaterialType::Silver:
-		return item->modifier % 5 + (4 * (item->modifier % 5) + 169LL) + rarity;
+		return item->modifier % 5 + (4 * (item->modifier % 5 + 469LL)) + rarity;
 	default:
 		return item->modifier % 5 + (4 * (item->modifier % 5) + 1851LL) + rarity;
 	}
@@ -613,7 +617,7 @@ uint64_t GetCollectibleItemModel(cube::Item* item) {
 	case 20:
 		return 2798LL;
 	case 21:
-		return 2766LL;
+		return 3266LL;
 	case 22:
 		return 1034LL;
 	case 23:
@@ -668,11 +672,10 @@ uint64_t GetCoinItemModel(cube::Item* item) {
 	case cube::Item::MaterialType::Gold:
 		return 2785LL;
 	case cube::Item::MaterialType::Silver:
-		return 2784LL;
 	case cube::Item::MaterialType::Platinum:
-		return 2783LL;
+		return 2784LL;
 	default:
-		return 0LL;
+		return 2783LL;
 	}
 }
 
@@ -1109,295 +1112,145 @@ uint64_t GetUnknownItemModel(cube::Item* item) {
 extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteManager * sprite_manager, cube::Item * original_item)
 {
 	cube::Item item;
-	((void(*)(cube::Item*, cube::Item*))CWOffset(0x1092B0))(original_item, &item); // copy item, but change things for item 0x16 quest items
+	((void(*)(cube::Item*, cube::Item*))CWOffset(0x1092B0))(original_item, &item); // copy item, but change things for category 22 quest items
+	uint64_t id = 0;
 	switch (item.category) {
 	case cube::Item::CategoryType::Consumable : {
-		uint64_t id = GetConsumableItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		return sprite_manager->sprites.at(id);
+		id = GetConsumableItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Formula: {
-		uint64_t id = GetScrollItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		return sprite_manager->sprites.at(id);
+		id = GetScrollItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Weapon: {
-		uint64_t id = GetWeaponItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetWeaponItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::ArmorChest: {
-		uint64_t id = GetArmorChestItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetArmorChestItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::ArmorGloves: {
-		uint64_t id = GetArmorGlovesItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetArmorGlovesItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::ArmorBoots: {
-		uint64_t id = GetArmorBootsItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetArmorBootsItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::ArmorShoulders: {
-		uint64_t id = GetArmorShouldersItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetArmorShouldersItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Amulet: {
-		uint64_t id = GetAmuletItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetAmuletItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Ring: {
-		uint64_t id = GetRingItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetRingItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::UnknownVoxel: {
 		uint64_t id = GetUnknownVoxelItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		break;
 	}
 	case cube::Item::CategoryType::Collectible: {
-		uint64_t id = GetCollectibleItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetCollectibleItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Coin: {
-		uint64_t id = GetCoinItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetCoinItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::PlatinumCoin: {
-		uint64_t id = GetPlatinumCoinItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetPlatinumCoinItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::ManaCube: {
-		uint64_t id = GetManaCubeItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetManaCubeItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Leftover: { // leftover
-		uint64_t id = GetLeftoverItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetLeftoverItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Beak: {
-		uint64_t id = GetBeakItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetBeakItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Painting: {
-		uint64_t id = GetPaintingItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetPaintingItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Vase: {
-		uint64_t id = GetVaseItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetVaseItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Candle: {
-		uint64_t id = GetCandleItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetCandleItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::PetCage: {
-		uint64_t id = GetPetCageItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetPetCageItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::PetFood: {
-		uint64_t id = GetPetFoodItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetPetFoodItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Quest: {
-		uint64_t id = GetQuestItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetQuestItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Artifact: {
-		uint64_t id = ((uint64_t(*)(cube::SpriteManager*, int, int))CWOffset(0x1737B0))(sprite_manager, item.id, item.modifier);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		//id = ((uint64_t(*)(cube::SpriteManager*, int, int))CWOffset(0x1737B0))(sprite_manager, item.id, item.modifier);
+		return ((cube::Sprite*(*)(cube::SpriteManager*, int, int))CWOffset(0x1737B0))(sprite_manager, item.id, item.modifier);
+		break;
 	}
 	case cube::Item::CategoryType::Special: {
-		uint64_t id = GetSpecialItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetSpecialItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Lamp: {
-		uint64_t id = GetLampItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetLampItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::EyePatch: {
-		uint64_t id = GetEyePatchItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetEyePatchItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Building: {
-		uint64_t id = GetBuildingItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetBuildingItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Potion: {
-		uint64_t id = GetPotionItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetPotionItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Glyph: {
-		uint64_t id = GetGlyphItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetGlyphItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Loot: {
-		uint64_t id = GetLootItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetLootItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::ManaSpirit: {
-		uint64_t id = GetManaSpiritItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetManaSpiritItemModel(&item);
+		break;
 	}
 	case cube::Item::CategoryType::Unknown: {
-		uint64_t id = GetUnknownItemModel(&item);
-		if (id < 0 || id >= sprite_manager->sprites.size()) {
-			return nullptr;
-		}
-		else {
-			return sprite_manager->sprites.at(id);
-		}
+		id = GetUnknownItemModel(&item);
+		break;
 	}
 	default:
 		return nullptr; //sprite_manager->sprites.at(3121LL);
 	}
+	if (id <= 0 || id >= sprite_manager->sprites.size()) {
+		return nullptr;
+	}
+	return sprite_manager->sprites.at(id);
 };
 
 overwrite_function(0x173B10, cube__SpriteManager__GetItemModelSprite);

@@ -1113,6 +1113,7 @@ extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteMan
 {
 	cube::Item item;
 	((void(*)(cube::Item*, cube::Item*))CWOffset(0x1092B0))(original_item, &item); // copy item, but change things for category 22 quest items
+
 	uint64_t id = 0;
 	switch (item.category) {
 	case cube::Item::CategoryType::Consumable : {
@@ -1171,7 +1172,7 @@ extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteMan
 		id = GetManaCubeItemModel(&item);
 		break;
 	}
-	case cube::Item::CategoryType::Leftover: { // leftover
+	case cube::Item::CategoryType::Leftover: {
 		id = GetLeftoverItemModel(&item);
 		break;
 	}
@@ -1204,7 +1205,6 @@ extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteMan
 		break;
 	}
 	case cube::Item::CategoryType::Artifact: {
-		//id = ((uint64_t(*)(cube::SpriteManager*, int, int))CWOffset(0x1737B0))(sprite_manager, item.id, item.modifier);
 		return ((cube::Sprite*(*)(cube::SpriteManager*, int, int))CWOffset(0x1737B0))(sprite_manager, item.id, item.modifier);
 		break;
 	}
@@ -1245,9 +1245,9 @@ extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteMan
 		break;
 	}
 	default:
-		return nullptr; //sprite_manager->sprites.at(3121LL);
+		return nullptr;
 	}
-	if (id <= 0 || id >= sprite_manager->sprites.size()) {
+	if (id <= 0 || id >= sprite_manager->sprites.size()) { // The id 0 can't be returned by that function. that's the only flaw.
 		return nullptr;
 	}
 	return sprite_manager->sprites.at(id);

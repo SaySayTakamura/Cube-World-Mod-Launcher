@@ -1113,8 +1113,15 @@ extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteMan
 {
 	cube::Item item;
 	((void(*)(cube::Item*, cube::Item*))CWOffset(0x1092B0))(original_item, &item); // copy item, but change things for category 22 quest items
-
+	
 	uint64_t id = 0;
+
+	auto search = modhelper::ItemBuilder::built_items_id.find(std::make_pair((cube::Item::CategoryType)item.category, item.id));
+	if (search != modhelper::ItemBuilder::built_items_id.end()) {
+		cube::Sprite* sprite = search->second->getModel(sprite_manager, &item);
+		if (sprite) return sprite;
+	}
+
 	switch (item.category) {
 	case cube::Item::CategoryType::Consumable : {
 		id = GetConsumableItemModel(&item);

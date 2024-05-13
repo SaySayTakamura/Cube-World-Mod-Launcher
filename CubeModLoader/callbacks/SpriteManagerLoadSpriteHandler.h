@@ -6,12 +6,6 @@
 extern "C" void LoadSpriteHandler(cube::SpriteManager* sprite_manager, std::string* string) {
     sprite_manager->LoadSprites();
     //((void(*)(cube::SpriteManager*, std::string))CWOffset(0x177F50))(sprite_manager, *string);
-    //std::string file_path("sprites/test.cub");
-    //cube::Sprite* sprite = sprite_manager->CreateSprite();
-    //sprite_manager->sprites.push_back(sprite);
-    //std::string model_id = std::to_string(sprite_manager->sprites.size());
-    //Popup("Model id: ", model_id.c_str());
-    //sprite_manager->ParseCubToSprite(sprite, file_path);
     //string->append(string->c_str());
 }
 

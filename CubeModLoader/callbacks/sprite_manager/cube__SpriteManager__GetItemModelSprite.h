@@ -1116,11 +1116,26 @@ extern "C" cube::Sprite* cube__SpriteManager__GetItemModelSprite(cube::SpriteMan
 	
 	uint64_t id = 0;
 
-	auto search = modhelper::ItemBuilder::built_items_id.find(std::make_pair((cube::Item::CategoryType)item.category, item.id));
+	if (modhelper::GLOBAL_ITEM_MANAGER.Exists(item.id))
+	{
+		modhelper::ItemData* dt = modhelper::GLOBAL_ITEM_MANAGER.Get(item.id);
+
+		if (dt != nullptr )
+		{
+			cube::Sprite* spr = dt->itemBehaviour->GetModel(sprite_manager, &item);
+			if (spr != nullptr)
+			{
+				return spr;
+			}
+		}
+
+	}
+
+	/*auto search = modhelper::ItemBuilder::built_items_id.find(std::make_pair((cube::Item::CategoryType)item.category, item.id));
 	if (search != modhelper::ItemBuilder::built_items_id.end()) {
 		cube::Sprite* sprite = search->second->getModel(sprite_manager, &item);
 		if (sprite) return sprite;
-	}
+	}*/
 
 	switch (item.category) {
 	case cube::Item::CategoryType::Consumable : {

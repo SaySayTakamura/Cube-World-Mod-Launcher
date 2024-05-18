@@ -52,6 +52,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/ChunkRemeshHandler.h"
 #include "callbacks/ChunkRemeshedHandler.h"
 #include "callbacks/SpriteManagerLoadSpriteHandler.h"
+#include "callbacks/GetItemNameHandler.h"
 
 #include "callbacks/gui/cube__StartMenuWidget__Draw.h"
 #include "callbacks/gui/cube__CharacterPreviewWidget__Draw.h"
@@ -70,6 +71,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/item/cube__Item__OnGetGoldBagValue.h"
 #include "callbacks/item/cube__Item__OnClassCanWearItem.h"
 #include "callbacks/item/cube__Item__OnGetConsumableUseTime.h"
+#include "callbacks/item/cube__Item__OnGetItemNameColor.h"
 #include "callbacks/sprite_manager/cube__SpriteManager__GetItemModelSprite.h"
 
 void SetupHandlers() {
@@ -89,6 +91,7 @@ void SetupHandlers() {
     setup_function(cube__Item__OnGetGoldBagValue);
     setup_function(cube__Item__OnClassCanWearItem);
     setup_function(cube__Item__OnGetConsumableUseTime);
+    setup_function(cube__Item__OnGetItemNameColor);
     setup_function(cube__SpriteManager__GetItemModelSprite);
 
     // Should be totally reverse engineered if put here.
@@ -106,6 +109,7 @@ void SetupHandlers() {
 	SetupGetMouseStateHandler();
 	SetupPresentHandler();
     SetupLoadSpriteHandler();
+    SetupGetItemNameHandler();
 	SetupCreatureCriticalCalculatedHandler();
 	SetupCreatureAttackPowerCalculatedHandler();
 	SetupCreatureSpellPowerCalculatedHandler();

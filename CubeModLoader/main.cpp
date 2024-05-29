@@ -66,6 +66,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/game/cube__Game__MouseUp.h"
 #include "callbacks/game/cube__Game__HandleMouseWheel.h"
 #include "callbacks/game/cube__Game__Update.h"
+#include "callbacks/game/cube__Game__CraftingInventoryUpdate.h"
 #include "callbacks/item/cube__Item__OnGetBuyingPrice.h"
 #include "callbacks/item/cube__Item__OnGetSellingPrice.h"
 #include "callbacks/item/cube__Item__OnGetGoldBagValue.h"
@@ -76,16 +77,18 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 
 void SetupHandlers() {
     setup_function(cube__Creature__GetArmor);
+    //setup_function(cube__Creature__GetNextAbilityId);
     setup_function(cube__Creature__OnPlayerCombatDeath);
     setup_function(cube__Creature__OnPlayerDrownDeath);
     setup_function(cube__Creature__OnPlayerFallDeath);
-    setup_function(cube__Creature__OnCreatureDeath);
+    setup_function(cube__Creature__OnCreatureDeath); 
     setup_function(cube__Creature__CanEquipItem);
     setup_function(cube__StartMenuWidget__Draw);
     //setup_function(cube__CharacterPreviewWidget__Draw);
     setup_function(cube__Game__MouseUp);
     //setup_function(cube__Game__HandleMouseWheel);
     setup_function(cube__Game__Update);
+    setup_function(cube__Game__CraftingInventoryUpdate);
     setup_function(cube__Item__GetBuyingPrice);
     setup_function(cube__Item__OnGetSellingPrice);
     setup_function(cube__Item__OnGetGoldBagValue);

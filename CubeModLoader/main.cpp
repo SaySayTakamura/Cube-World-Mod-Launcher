@@ -89,6 +89,7 @@ void SetupHandlers() {
     //setup_function(cube__Game__HandleMouseWheel);
     setup_function(cube__Game__Update);
     setup_function(cube__Game__CraftingInventoryUpdate);
+    setup_function(cube__Game__LoadItemCraft);
     setup_function(cube__Item__GetBuyingPrice);
     setup_function(cube__Item__OnGetSellingPrice);
     setup_function(cube__Item__OnGetGoldBagValue);

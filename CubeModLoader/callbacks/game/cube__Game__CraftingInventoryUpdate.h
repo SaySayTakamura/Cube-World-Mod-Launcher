@@ -62,21 +62,11 @@ void AddSpecialCubes(cube::Item* preview_item, CraftItem* dest_item) {
     dest_item->craft_vec.push_back(ReversedItemStack(amount, special_cube));
 }
 
-extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * preview_item, CraftItem * dest_item)
-{
-    cube::Item empty_item;
-    dest_item->Copy(&empty_item);
-    dest_item->type = None;
-
-    std::vector<ReversedItemStack> vector = {};
-
-    dest_item->craft_vec = vector;
-
+void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
     if (preview_item->category == cube::Item::CategoryType::Glyph) {
         // Nothing?
-        return 1;
+        return;
     }
-    dest_item->Copy(preview_item);
     switch (preview_item->category) {
 
     case cube::Item::Consumable: {
@@ -148,11 +138,11 @@ extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * prev
             break;
         }
         }
-        return 1;
+        return;
     }
 
     case cube::Item::Weapon: {
-     // TODO: do this pls
+        // TODO: do this pls
         cube::Item cube(cube::Item::Collectible, 10); // cube
         cube.material = cube::Item::Iron;
         cube::Item special_cube(cube::Item::Collectible, 10); // cube
@@ -216,7 +206,7 @@ extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * prev
             dest_item->type = Anvil;
             break;
         }
-        default: 
+        default:
             break;
         }
         AddSpecialCubes(preview_item, dest_item);
@@ -417,16 +407,36 @@ extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * prev
     default:
         AddSpecialCubes(preview_item, dest_item);
     }
-    return 1;
+}
+
+extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * preview_item, CraftItem * dest_item)
+{
+    cube::Item empty_item;
+    dest_item->Copy(&empty_item);
+    dest_item->type = None;
+
+    std::vector<ReversedItemStack> vector = {};
+
+    dest_item->craft_vec = vector;
+    dest_item->Copy(preview_item);
+
+    LoadVanillaCrafts(preview_item, dest_item);
+
+    for (DLL* dll : allDlls) {
+        std::vector<cube::ItemStack>* craft = dll->mod->crafting_manager.GetCraft(preview_item);
+        if (craft == nullptr) continue;
+
+        for (cube::ItemStack stack : *craft) {
+            dest_item->craft_vec.push_back(ReversedItemStack(stack.quantity, stack.item));
+        }
+        return true;
+    }
+
+    return true;
 }
 
 extern "C" void cube__Game__CraftingInventoryUpdate(cube::Game * game)
 {
-    //cube::Item water_flask(cube::Item::Collectible, 26);
-    //cube::Item heart_flower(cube::Item::Collectible, 22);
-    //game->world->local_creature->DropItem(&water_flask);
-    //game->world->local_creature->DropItem(&heart_flower);
-
 	cube::InventoryWidget* widget = game->gui.crafting_inventory_widget;
 	auto itemVector = widget->itemVector;
 	if (itemVector != nullptr)
@@ -696,12 +706,6 @@ extern "C" void cube__Game__CraftingInventoryUpdate(cube::Game * game)
         alchemy_vec->push_back(cube::ItemStack(0, toughness_elixir_item));
         alchemy_vec->push_back(cube::ItemStack(0, sanity_elixir_item));
 
-        // REMOVE THESE (A craft is define but not added to the craft list)
-        /*cube::Item wisdom_item(cube::Item::Consumable, 3);
-        cube::Item greater_life_potion_item(cube::Item::Consumable, 12);
-        alchemy_vec->push_back(cube::ItemStack(0, wisdom_item));
-        alchemy_vec->push_back(cube::ItemStack(0, greater_life_potion_item));*/
-
         // Ingredients
         // TODO: get possible craft amount.
         cube::Item water_flask_item(cube::Item::Collectible, 26);
@@ -731,6 +735,13 @@ extern "C" void cube__Game__CraftingInventoryUpdate(cube::Game * game)
         B2EE0(game, 4, alchemy_vec);
         B2EE0(game, 5, ingredient_vec);*/
 
+        for (uint8_t priority = 0; priority <= 4; priority += 1) {
+            for (DLL* dll : modDLLs) {
+                if (dll->mod->OnCraftInventoryUpdatePriority == (GenericMod::Priority)priority) {
+                    dll->mod->OnCraftInventoryUpdate(game, creature, itemVector);
+                }
+            }
+        }
 	}
 }
 

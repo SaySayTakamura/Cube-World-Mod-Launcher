@@ -422,7 +422,7 @@ extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * prev
 
     LoadVanillaCrafts(preview_item, dest_item);
 
-    for (DLL* dll : allDlls) {
+    for (DLL* dll : modDLLs) {
         std::vector<cube::ItemStack>* craft = dll->mod->crafting_manager.GetCraft(preview_item);
         if (craft == nullptr) continue;
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "../../CWSDK/cwsdk.h"
-
+/*
 extern "C" void cube__Game__HandleMouseWheel(cube::Game* game, int mousedata)
 {
 	cube::InventoryWidget* widget = game->gui.equipment_inventory_widget;
@@ -19,4 +19,4 @@ extern "C" void cube__Game__HandleMouseWheel(cube::Game* game, int mousedata)
 	return;
 }
 
-overwrite_function(0x97CC0, cube__Game__HandleMouseWheel);
+overwrite_function(0x97CC0, cube__Game__HandleMouseWheel);*/

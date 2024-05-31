@@ -2,18 +2,6 @@
 #include "../../CWSDK/cwsdk.h"
 #include <cube/Item.h>
 
-enum CraftRequirementType : int {
-    None = 0,
-    Water = 1,
-    Furnace = 3,
-    Anvil = 4,
-    SpinningWheel = 5,
-    Loom = 6,
-    Saw = 7,
-    Workbench = 8,
-    Campfire = 9
-};
-
 class ReversedItemStack {
 public:
     cube::Item item;
@@ -28,7 +16,7 @@ public:
 
 class CraftItem : public cube::Item {
 public:
-    CraftRequirementType type;
+    modhelper::CraftingManager::CraftRequirementType type;
     std::vector<ReversedItemStack> craft_vec;
 };
 
@@ -106,7 +94,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         }
         case 4: { // Ginseng Soup
             dest_item->craft_vec.push_back(ReversedItemStack(4, cube::Item(cube::Item::Collectible, 20))); // Ginseng root
-            dest_item->type = Campfire;
+            dest_item->type = modhelper::CraftingManager::Campfire;
             break;
         }
         case 7: { // Snowberry Mash
@@ -116,7 +104,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         case 8: { // Mushroom Spit
             dest_item->craft_vec.push_back(ReversedItemStack(1, cube::Item(cube::Item::Collectible, 15))); // Mushroom
             dest_item->craft_vec.push_back(ReversedItemStack(1, cube::Item(cube::Item::Collectible, 21))); // Onion slice
-            dest_item->type = Campfire;
+            dest_item->type = modhelper::CraftingManager::Campfire;
             break;
         }
         case 10: { // Pineaple Splice
@@ -125,7 +113,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         }
         case 11: { // Pumpkin Muffin
             dest_item->craft_vec.push_back(ReversedItemStack(1, cube::Item(cube::Item::Collectible, 16))); // Pumpkin
-            dest_item->type = Campfire;
+            dest_item->type = modhelper::CraftingManager::Campfire;
             break;
         }
         case 12: { // Greater Life Potion
@@ -154,7 +142,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         case 3: // Dagger
         case 0xD: { // Shield
             dest_item->craft_vec.push_back(ReversedItemStack(5 * (preview_item->rarity + 1), cube));
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
             break;
         }
         case 4: { // Fist
@@ -162,7 +150,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
             cube::Item cotton_yard(cube::Item::Collectible, 9);
             cotton_yard.material = cube::Item::Cotton;
             dest_item->craft_vec.push_back(ReversedItemStack((2 * preview_item->rarity) + 2, cotton_yard)); // Cotton yard
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
             break;
         }
         case 5: // Longsword
@@ -170,7 +158,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         case 0x10: // Greataxe
         case 0x11: { // Greatmace
             dest_item->craft_vec.push_back(ReversedItemStack(10 * (preview_item->rarity + 1), cube));
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
             break;
         }
         case 6: { // Bow
@@ -179,7 +167,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
             cube::Item linnen_yard(cube::Item::Collectible, 9);
             linnen_yard.material = cube::Item::Linnen;
             dest_item->craft_vec.push_back(ReversedItemStack(preview_item->rarity + 1, linnen_yard)); // Linnen yard
-            dest_item->type = Workbench;
+            dest_item->type = modhelper::CraftingManager::Workbench;
             break;
         }
         case 7: { // Crossbow
@@ -189,7 +177,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
             cube::Item linnen_yard(cube::Item::Collectible, 9);
             linnen_yard.material = cube::Item::Linnen;
             dest_item->craft_vec.push_back(ReversedItemStack(preview_item->rarity + 1, linnen_yard)); // Linnen yard
-            dest_item->type = Workbench;
+            dest_item->type = modhelper::CraftingManager::Workbench;
             break;
         }
         case 8: // Boomerang    
@@ -197,13 +185,13 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         case 0xB: { // Wand
             cube.material = cube::Item::Wood;
             dest_item->craft_vec.push_back(ReversedItemStack(10 * (preview_item->rarity + 1), cube));
-            dest_item->type = Workbench;
+            dest_item->type = modhelper::CraftingManager::Workbench;
             break;
         }
         case 0xC: { // Bracelet
             cube.material = preview_item->material;
             dest_item->craft_vec.push_back(ReversedItemStack(5 * (preview_item->rarity + 1), cube));
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
             break;
         }
         default:
@@ -219,13 +207,13 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         if (material.material == cube::Item::MaterialType::Iron)
         {
             dest_item->craft_vec.push_back(ReversedItemStack(2 * (5 * (preview_item->rarity + 1)), material));
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
         }
         else
         {
             material.id = 9; // yarn
             dest_item->craft_vec.push_back(ReversedItemStack(2 * (5 * (preview_item->rarity + 1)), material));
-            dest_item->type = Loom;
+            dest_item->type = modhelper::CraftingManager::Loom;
         }
         AddSpecialCubes(preview_item, dest_item);
         break;
@@ -237,13 +225,13 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         if (material.material == cube::Item::MaterialType::Iron)
         {
             dest_item->craft_vec.push_back(ReversedItemStack(5 * (preview_item->rarity + 1), material));
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
         }
         else
         {
             material.id = 9; // yarn
             dest_item->craft_vec.push_back(ReversedItemStack(5 * (preview_item->rarity + 1), material));
-            dest_item->type = Loom;
+            dest_item->type = modhelper::CraftingManager::Loom;
         }
         AddSpecialCubes(preview_item, dest_item);
         break;
@@ -255,13 +243,13 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         if (material.material == cube::Item::MaterialType::Iron)
         {
             dest_item->craft_vec.push_back(ReversedItemStack(5 * (preview_item->rarity + 1), material));
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
         }
         else
         {
             material.id = 9; // yarn
             dest_item->craft_vec.push_back(ReversedItemStack(5 * (preview_item->rarity + 1), material));
-            dest_item->type = Loom;
+            dest_item->type = modhelper::CraftingManager::Loom;
         }
         AddSpecialCubes(preview_item, dest_item);
         break;
@@ -273,13 +261,13 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
         if (material.material == cube::Item::MaterialType::Iron)
         {
             dest_item->craft_vec.push_back(ReversedItemStack(6 * (preview_item->rarity + 1), material));
-            dest_item->type = Anvil;
+            dest_item->type = modhelper::CraftingManager::Anvil;
         }
         else
         {
             material.id = 9; // yarn
             dest_item->craft_vec.push_back(ReversedItemStack(6 * (preview_item->rarity + 1), material));
-            dest_item->type = Loom;
+            dest_item->type = modhelper::CraftingManager::Loom;
         }
         AddSpecialCubes(preview_item, dest_item);
         break;
@@ -318,17 +306,17 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
                 break;
             }
             dest_item->craft_vec.push_back(ReversedItemStack(1, material));
-            dest_item->type = SpinningWheel;
+            dest_item->type = modhelper::CraftingManager::SpinningWheel;
             break;
         }
 
         case 10: { // Cube
             cube::Item nugget(cube::Item::Collectible, 0); // Nugget
-            dest_item->type = Furnace;
+            dest_item->type = modhelper::CraftingManager::Furnace;
             nugget.material = preview_item->material;
             if (nugget.material == cube::Item::Wood) {
                 nugget.id = 1; // Log
-                dest_item->type = Saw;
+                dest_item->type = modhelper::CraftingManager::Saw;
             }
             dest_item->craft_vec.push_back(ReversedItemStack(1, nugget));
             break;
@@ -336,7 +324,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
 
         case 22: { // HeartFlower
             dest_item->craft_vec.push_back(ReversedItemStack(1, cube::Item(cube::Item::Collectible, 24))); // IceFlower
-            dest_item->type = Campfire;
+            dest_item->type = modhelper::CraftingManager::Campfire;
             break;
         }
 
@@ -344,7 +332,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
             cube::Item glass_bottle(cube::Item::Collectible, 12); // Glass bottle
             glass_bottle.material = cube::Item::Glass;
             dest_item->craft_vec.push_back(ReversedItemStack(1, glass_bottle));
-            dest_item->type = Water;
+            dest_item->type = modhelper::CraftingManager::Water;
             break;
         }
 
@@ -390,7 +378,7 @@ void LoadVanillaCrafts(cube::Item* preview_item, CraftItem* dest_item) {
             dest_item->craft_vec.push_back(ReversedItemStack(1, cube::Item(cube::Item::Collectible, 38))); // Sugar Cube
             dest_item->craft_vec.push_back(ReversedItemStack(3, cube::Item(cube::Item::Collectible, 43))); // Cocoa bean
             dest_item->craft_vec.push_back(ReversedItemStack(1, cube::Item(cube::Item::Collectible, 26))); // Water flask
-            dest_item->type = Campfire;
+            dest_item->type = modhelper::CraftingManager::Campfire;
             break;
         }
         case 6: { // Green Smoothie
@@ -413,7 +401,7 @@ extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * prev
 {
     cube::Item empty_item;
     dest_item->Copy(&empty_item);
-    dest_item->type = None;
+    dest_item->type = modhelper::CraftingManager::None;
 
     std::vector<ReversedItemStack> vector = {};
 
@@ -423,10 +411,11 @@ extern "C" bool cube__Game__LoadItemCraft(cube::World * world, cube::Item * prev
     LoadVanillaCrafts(preview_item, dest_item);
 
     for (DLL* dll : modDLLs) {
-        std::vector<cube::ItemStack>* craft = dll->mod->crafting_manager.GetCraft(preview_item);
+        modhelper::CraftingManager::CraftingValue* craft = dll->mod->crafting_manager.GetCraft(preview_item);
         if (craft == nullptr) continue;
 
-        for (cube::ItemStack stack : *craft) {
+        dest_item->type = craft->first;
+        for (cube::ItemStack stack : craft->second) {
             dest_item->craft_vec.push_back(ReversedItemStack(stack.quantity, stack.item));
         }
         return true;

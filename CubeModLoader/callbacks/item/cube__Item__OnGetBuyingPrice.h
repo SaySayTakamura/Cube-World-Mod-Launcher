@@ -10,6 +10,13 @@ extern "C" void cube__Item__GetBuyingPrice(float base_cost, cube::Item* item, in
 			if (dll->mod->OnGetItemBuyingPricePriority == (GenericMod::Priority)priority) {
 				dll->mod->OnGetItemBuyingPrice(item, price);
 			}
+
+			modhelper::ItemData* item_data = dll->mod->item_manager.Get((cube::Item::CategoryType)item->category, item->id);
+			if (item_data == nullptr) continue;
+			int cost = item_data->itemBehaviour->GetBuyingPrice(item);
+			if (cost <= 0) continue;
+			*price = cost;
+			return;
 		}
 	}
 }

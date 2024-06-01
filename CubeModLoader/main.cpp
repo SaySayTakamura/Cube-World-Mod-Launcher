@@ -74,6 +74,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/item/cube__Item__OnGetConsumableUseTime.h"
 #include "callbacks/item/cube__Item__OnGetItemNameColor.h"
 #include "callbacks/sprite_manager/cube__SpriteManager__GetItemModelSprite.h"
+#include "callbacks/controls/cube__Controls__Save.h"
 
 void SetupHandlers() {
     setup_function(cube__Creature__GetArmor);
@@ -96,6 +97,7 @@ void SetupHandlers() {
     setup_function(cube__Item__OnClassCanWearItem);
     setup_function(cube__Item__OnGetConsumableUseTime);
     setup_function(cube__Item__OnGetItemNameColor);
+    setup_function(cube__Controls__Save);
     setup_function(cube__SpriteManager__GetItemModelSprite);
 
     // Should be totally reverse engineered if put here.

@@ -56,6 +56,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 
 #include "callbacks/gui/cube__StartMenuWidget__Draw.h"
 #include "callbacks/gui/cube__CharacterPreviewWidget__Draw.h"
+#include "callbacks/gui/cube__ControlsWidget__Draw.h"
 #include "callbacks/gui/cube__GUI__Load.h"
 #include "callbacks/creature/cube__Creature__GetArmor.h"
 #include "callbacks/creature/cube__Creature__OnPlayerCombatDeath.h"
@@ -85,6 +86,7 @@ void SetupHandlers() {
     setup_function(cube__Creature__OnCreatureDeath); 
     setup_function(cube__Creature__CanEquipItem);
     setup_function(cube__StartMenuWidget__Draw);
+    setup_function(cube__ControlsWidget__Draw);
     //setup_function(cube__CharacterPreviewWidget__Draw);
     setup_function(cube__Game__MouseUp);
     //setup_function(cube__Game__HandleMouseWheel);

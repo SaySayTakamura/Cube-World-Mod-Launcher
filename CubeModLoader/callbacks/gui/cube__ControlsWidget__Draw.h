@@ -108,11 +108,13 @@ int wParamToDInput(int wParam_id) {
 
 extern "C" void cube__ControlsWidget__Draw(cube::ControlsWidget * widget)
 {
-    std::map<std::pair<std::wstring*, std::string>, modhelper::KeybindManager::KeybindValue> keybinds = {};
+    std::map<std::string, std::wstring*> displayNameMap = {};
+    std::map<std::string, modhelper::KeybindManager::KeybindValue> keybinds = {};
     for (DLL* dll : modDLLs) {
         std::map<std::string, modhelper::KeybindManager::KeybindValue>* mod_keybinds = dll->mod->keybind_manager.GetKeybinds();
         for (std::map<std::string, modhelper::KeybindManager::KeybindValue>::iterator it = mod_keybinds->begin(); it != mod_keybinds->end(); ++it) {
-            keybinds.insert({ std::make_pair(dll->mod->keybind_manager.GetKeybindDisplayName(it->first), it->first), it->second });
+            displayNameMap.insert({ it->first, dll->mod->keybind_manager.GetKeybindDisplayName(it->first) });
+            keybinds.insert({ it->first, it->second });
         }
     }
 
@@ -145,77 +147,69 @@ extern "C" void cube__ControlsWidget__Draw(cube::ControlsWidget * widget)
         for (int id = v15 - scroll_position; id > 0; id--) {
             widget->text_pivot = plasma::TextPivot::Left;
             FloatRGBA color = { 1.0, 1.0, 1.0, 1.0 }; // White
+            std::pair<int, int> key = { 0, 0 };
+            std::wstring keybind_display_name;
 
             if (v15-id >= 23) {
                 if (v15 - id < 23 + keybinds_size) {
                     int keybind_id = (v15 - id) - 23;
                     int i = 0;
-                    std::wstring *keybind_display_name;
-                    std::pair<int, int> key = {0, 0};
-                    for (std::map<std::pair<std::wstring*, std::string>, modhelper::KeybindManager::KeybindValue>::iterator it = keybinds.begin(); it != keybinds.end(); it++) {
+                    for (std::map<std::string, modhelper::KeybindManager::KeybindValue>::iterator it = keybinds.begin(); it != keybinds.end(); it++) {
                         if (i == keybind_id) {
-                            keybind_display_name = it->first.first;
+                            keybind_display_name = *displayNameMap.at(it->first);
                             key.first = wParamToDInput(it->second.first);
                             key.second = (int)it->second.second;
                             break;
                         }
                         i++;
                     }
-                    ((uint64_t(*)(cube::BaseWidget*, FloatRGBA*))CWOffset(0x269160))(widget, &color);
-                    FloatRGBA border_color = { 0, 0, 0, 1 };
-                    widget->SetBorderColor(&border_color);
-                    FloatVector2 pos = { 0, 0 };
-                    widget->DrawString(&pos, keybind_display_name, 20.0, v12);
-                    widget->text_pivot = plasma::TextPivot::Center;
-                    std::wstring keybind_key_name;
-                    ((std::wstring * (*)(cube::Game::KeyNames*, std::wstring*, int*))CWOffset(0x4C830))(&widget->game->key_info, &keybind_key_name, (int*)&key);
-                    FloatVector2 pos2 = { 0, 0 };
-                    widget->DrawString(&pos2, &keybind_key_name, ((widget_size_x - 250.0) * 0.5) + 240.0, v12);
-                }
-            }
-            else {
-                int selected_index = widget->selected_index;
-                if (scroll_position == selected_index) {
-                    color = { 1.0, 0.35, 0.35, 1.0 }; // Red
-                    ((uint64_t(*)(cube::BaseWidget*, FloatRGBA*))CWOffset(0x269160))(widget, &color);
-                    FloatRGBA border_color = { 0, 0, 0, 1 };
-                    widget->SetBorderColor(&border_color);
-                    std::wstring keybind_display_name;
-                    ((std::wstring * (*)(std::wstring*, int))CWOffset(0x42670))(&keybind_display_name, scroll_position);
-                    FloatVector2 pos = { 0, 0 };
-                    widget->DrawString(&pos, &keybind_display_name, 20.0, v12);
-                    widget->text_pivot = plasma::TextPivot::Center;
-                    std::wstring keybind_key_name = L"Press a key";
-                    FloatVector2 pos2 = { 0, 0 };
-                    widget->DrawString(&pos2, &keybind_key_name, ((widget_size_x - 250.0) * 0.5) + 240.0, v12);
+                    control_ptr = &key.first;
                 }
                 else {
-                    if (*control_ptr == 0 && *(control_ptr + 1) == 0) {
-                        color = { 0.2, 1.0, 0.2, 1.0 }; // Green
-                    }
-                    if (selected_index < 0 && !widget->game->gap17C8[400] && relative_mouse_pos.x >= 0.0)
-                    {
-                        if ((widget_size_x - 40.0) > relative_mouse_pos.x
-                            && relative_mouse_pos.y >= (v12 - 20.0)
-                            && (v12 + 10.0) > relative_mouse_pos.y)
-                        {
-                            widget->hovered_index = scroll_position;
-                            color = { 0.2, 1.0, 1.0, 1.0 }; // Cyan
-                        }
-                    }
-                    ((uint64_t(*)(cube::BaseWidget*, FloatRGBA*))CWOffset(0x269160))(widget, &color);
-                    FloatRGBA border_color = { 0, 0, 0, 1 };
-                    widget->SetBorderColor(&border_color);
-                    std::wstring keybind_display_name;
-                    ((std::wstring * (*)(std::wstring*, int))CWOffset(0x42670))(&keybind_display_name, scroll_position);
-                    FloatVector2 pos = { 0, 0 };
-                    widget->DrawString(&pos, &keybind_display_name, 20.0, v12);
-                    widget->text_pivot = plasma::TextPivot::Center;
-                    std::wstring keybind_key_name;
-                    ((std::wstring * (*)(cube::Game::KeyNames*, std::wstring*, int*))CWOffset(0x4C830))(&widget->game->key_info, &keybind_key_name, control_ptr);
-                    FloatVector2 pos2 = { 0, 0 };
-                    widget->DrawString(&pos2, &keybind_key_name, ((widget_size_x - 250.0) * 0.5) + 240.0, v12);
+                    break;
                 }
+            }
+            int selected_index = widget->selected_index;
+            if (scroll_position == selected_index) {
+                color = { 1.0, 0.35, 0.35, 1.0 }; // Red
+                ((uint64_t(*)(cube::BaseWidget*, FloatRGBA*))CWOffset(0x269160))(widget, &color);
+                FloatRGBA border_color = { 0, 0, 0, 1 };
+                widget->SetBorderColor(&border_color);
+                if (v15 - id < 23)
+                    ((std::wstring * (*)(std::wstring*, int))CWOffset(0x42670))(&keybind_display_name, scroll_position);
+                FloatVector2 pos = { 0, 0 };
+                widget->DrawString(&pos, &keybind_display_name, 20.0, v12);
+                widget->text_pivot = plasma::TextPivot::Center;
+                std::wstring keybind_key_name = L"Press a key";
+                FloatVector2 pos2 = { 0, 0 };
+                widget->DrawString(&pos2, &keybind_key_name, ((widget_size_x - 250.0) * 0.5) + 240.0, v12);
+            }
+            else {
+                if (*control_ptr == 0 && *(control_ptr + 1) == 0) {
+                    color = { 0.2, 1.0, 0.2, 1.0 }; // Green
+                }
+                if (selected_index < 0 && !widget->game->gap17C8[400] && relative_mouse_pos.x >= 0.0)
+                {
+                    if ((widget_size_x - 40.0) > relative_mouse_pos.x
+                        && relative_mouse_pos.y >= (v12 - 20.0)
+                        && (v12 + 10.0) > relative_mouse_pos.y)
+                    {
+                        widget->hovered_index = scroll_position;
+                        color = { 0.2, 1.0, 1.0, 1.0 }; // Cyan
+                    }
+                }
+                ((uint64_t(*)(cube::BaseWidget*, FloatRGBA*))CWOffset(0x269160))(widget, &color);
+                FloatRGBA border_color = { 0, 0, 0, 1 };
+                widget->SetBorderColor(&border_color);
+                if (v15 - id < 23)
+                    ((std::wstring * (*)(std::wstring*, int))CWOffset(0x42670))(&keybind_display_name, scroll_position);
+                FloatVector2 pos = { 0, 0 };
+                widget->DrawString(&pos, &keybind_display_name, 20.0, v12);
+                widget->text_pivot = plasma::TextPivot::Center;
+                std::wstring keybind_key_name;
+                ((std::wstring * (*)(cube::Game::KeyNames*, std::wstring*, int*))CWOffset(0x4C830))(&widget->game->key_info, &keybind_key_name, control_ptr);
+                FloatVector2 pos2 = { 0, 0 };
+                widget->DrawString(&pos2, &keybind_key_name, ((widget_size_x - 250.0) * 0.5) + 240.0, v12);
             }
             v12 = v12 + 30.0;
             ++scroll_position;

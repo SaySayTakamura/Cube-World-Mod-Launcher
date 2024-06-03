@@ -57,6 +57,10 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/gui/cube__StartMenuWidget__Draw.h"
 #include "callbacks/gui/cube__CharacterPreviewWidget__Draw.h"
 #include "callbacks/gui/cube__ControlsWidget__Draw.h"
+#include "callbacks/gui/cube__ControlsWidget__ScrollDown.h"
+#include "callbacks/gui/cube__ControlsWidget__ScrollUp.h"
+#include "callbacks/gui/cube__ControlsWidget__ScrollGrab.h"
+#include "callbacks/gui/cube__ControlsWidget__UpdateScrollBarPosition.h"
 #include "callbacks/gui/cube__GUI__Load.h"
 #include "callbacks/creature/cube__Creature__GetArmor.h"
 #include "callbacks/creature/cube__Creature__OnPlayerCombatDeath.h"
@@ -67,6 +71,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/game/cube__Game__MouseUp.h"
 #include "callbacks/game/cube__Game__HandleMouseWheel.h"
 #include "callbacks/game/cube__Game__Update.h"
+#include "callbacks/game/cube__Game__RebindControl.h"
 #include "callbacks/game/cube__Game__CraftingInventoryUpdate.h"
 #include "callbacks/item/cube__Item__OnGetBuyingPrice.h"
 #include "callbacks/item/cube__Item__OnGetSellingPrice.h"
@@ -87,12 +92,17 @@ void SetupHandlers() {
     setup_function(cube__Creature__CanEquipItem);
     setup_function(cube__StartMenuWidget__Draw);
     setup_function(cube__ControlsWidget__Draw);
+    setup_function(cube__ControlsWidget__ScrollDown);
+    setup_function(cube__ControlsWidget__ScrollUp);
+    setup_function(cube__ControlsWidget__ScrollGrab);
+    setup_function(cube__ControlsWidget__UpdateScrollBarPosition);
     //setup_function(cube__CharacterPreviewWidget__Draw);
     setup_function(cube__Game__MouseUp);
     //setup_function(cube__Game__HandleMouseWheel);
     setup_function(cube__Game__Update);
     setup_function(cube__Game__CraftingInventoryUpdate);
     setup_function(cube__Game__LoadItemCraft);
+    setup_function(cube__Game__RebindControl);
     setup_function(cube__Item__GetBuyingPrice);
     setup_function(cube__Item__OnGetSellingPrice);
     setup_function(cube__Item__OnGetGoldBagValue);

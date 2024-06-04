@@ -113,8 +113,10 @@ extern "C" void cube__Game__RebindControl(cube::Game * game, int key_data[2])
     __int64 vanilla_id = 23LL;
     do
     {
-        if (p_controls->button_attack_2 == key_data[1] && p_controls->button_attack == key_data[0])
-            p_controls->button_attack = 0LL;
+        if (p_controls->button_attack_2 == key_data[1] && p_controls->button_attack == key_data[0]) {
+            p_controls->button_attack = 0;
+            p_controls->button_attack_2 = 0;
+        }
         p_controls = (cube::Controls*)(((char*)p_controls) + 8);
         --vanilla_id;
     } while (vanilla_id);
@@ -123,8 +125,7 @@ extern "C" void cube__Game__RebindControl(cube::Game * game, int key_data[2])
         std::map<std::string, modhelper::KeybindManager::KeybindValue>* keybinds = dll->mod->keybind_manager.GetKeybinds();
         for (std::map<std::string, modhelper::KeybindManager::KeybindValue>::iterator it = keybinds->begin(); it != keybinds->end(); ++it) {
             if (it->second.first == key_data[0] && it->second.second == key_data[1]) {
-                it->second.first = 0;
-                it->second.second = modhelper::KeybindManager::DeviceIds::Keyboard;
+                it->second = { 0, 0 };
             }
         }
     }
@@ -148,8 +149,8 @@ extern "C" void cube__Game__RebindControl(cube::Game * game, int key_data[2])
         int effective_id = selected_id - cur;
         for (std::map<std::string, modhelper::KeybindManager::KeybindValue>::iterator it = keybinds->begin(); it != keybinds->end(); ++it) {
             if (effective_id == 0) {
-                it->second.first = DInputToWParam(key_data[0]);
-                it->second.second = (modhelper::KeybindManager::DeviceIds)key_data[1];
+                it->second.first = key_data[0];
+                it->second.second = key_data[1];
             }
             effective_id--;
         }

@@ -157,8 +157,8 @@ extern "C" void cube__ControlsWidget__Draw(cube::ControlsWidget * widget)
                     for (std::map<std::string, modhelper::KeybindManager::KeybindValue>::iterator it = keybinds.begin(); it != keybinds.end(); it++) {
                         if (i == keybind_id) {
                             keybind_display_name = *displayNameMap.at(it->first);
-                            key.first = wParamToDInput(it->second.first);
-                            key.second = (int)it->second.second;
+                            key.first = it->second.first;
+                            key.second = it->second.second;
                             break;
                         }
                         i++;

@@ -60,6 +60,7 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/gui/cube__ControlsWidget__ScrollDown.h"
 #include "callbacks/gui/cube__ControlsWidget__ScrollUp.h"
 #include "callbacks/gui/cube__ControlsWidget__ScrollGrab.h"
+#include "callbacks/gui/cube__ControlsWidget__ResetKeybinds.h"
 #include "callbacks/gui/cube__ControlsWidget__UpdateScrollBarPosition.h"
 #include "callbacks/gui/cube__GUI__Load.h"
 #include "callbacks/creature/cube__Creature__GetArmor.h"
@@ -95,6 +96,7 @@ void SetupHandlers() {
     setup_function(cube__ControlsWidget__ScrollDown);
     setup_function(cube__ControlsWidget__ScrollUp);
     setup_function(cube__ControlsWidget__ScrollGrab);
+    setup_function(cube__ControlsWidget__ResetKeybinds);
     setup_function(cube__ControlsWidget__UpdateScrollBarPosition);
     //setup_function(cube__CharacterPreviewWidget__Draw);
     setup_function(cube__Game__MouseUp);

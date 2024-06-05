@@ -315,8 +315,8 @@ void mod::ModWidget::Draw(ModWidget* widget)
 		}
 
 		int y_pos = 4 * (text_offset + text_size) + current_height;
-		std::wstring temp_desc = std::wstring(L"This is a template description to test if the wrapping is working fine and a lot of nothing.");
-		std::wstring* desc = widget->GetSlicedModDescription(&temp_desc);
+		std::wstring base_desc = dll->mod->mod_metadata.GetDescriptionLitheral();
+		std::wstring* desc = widget->GetSlicedModDescription(&base_desc);
 		int desc_height = widget->GetModDescriptionHeight(dll, text_size);
 		int mod_height = widget->GetModHeight(dll, text_size);
 

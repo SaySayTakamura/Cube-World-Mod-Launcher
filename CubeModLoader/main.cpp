@@ -122,6 +122,13 @@ void SetupHandlers() {
 	SetupChunkRemeshedHandler();
 }
 
+//This holds the Item Manager Array
+static std::map<std::string, modhelper::ItemManager*> ITEM_MAP;
+
+
+
+
+
 
 // Handles injecting callbacks and the mods
 bool already_loaded_mods = false;
@@ -209,6 +216,36 @@ extern "C" void StartMods() {
 
     for (DLL* dll: modDLLs) {
 		dll->mod->Initialize();
+
+        #pragma region Old Code (do not use)
+        //In progress
+        //Developer's Note: Older mods are not compatible with Versioning Change.
+        //As of today CubeMegamod and PyroProgression does not execute the INITIALIZE function if the version if above their requirements.
+
+        //int majorVersion = ((int(*)())dll->ModMajorVersion)();
+        //int minorVersion = ((int(*)())dll->ModMinorVersion)();
+
+
+        //if (minorVersion == MOD_MINOR_VERSION)
+        //{
+
+        //    static modhelper::ItemManager* item_manager = dll->mod->GetItems();
+        //    if (item_manager != nullptr)
+        //    {
+        //        //modhelper::Utils::ShowMessage("Parsing ItemManager");
+        //        ITEM_MAP.emplace(dll->mod->GetMD().GetName(), item_manager);
+
+        //    }
+        //    else
+        //    {
+        //       // modhelper::Utils::ShowMessage("ItemManager detected as nullptr, skipping");
+        //    }
+        //}
+        //else
+        //{
+        //    //modhelper::Utils::ShowMessage("CURRENT MOD IS NOT COMPATIBLE WITH THIS FEATURE... YET");
+        //}
+#pragma endregion
     }
 
 	// Load legacy cwmods. Don't use this.

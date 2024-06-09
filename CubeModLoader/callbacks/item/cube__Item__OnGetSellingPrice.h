@@ -11,6 +11,12 @@ extern "C" int cube__Item__OnGetSellingPrice(cube::Item* item)
 			if (dll->mod->OnGetItemSellingPricePriority == (GenericMod::Priority)priority) {
 				dll->mod->OnGetItemSellingPrice(item, &sellingPrice);
 			}
+
+			modhelper::ItemData* item_data = dll->mod->item_manager.Get((cube::Item::CategoryType)item->category, item->id);
+			if (item_data == nullptr) continue;
+			int price = item_data->itemBehaviour->GetSellingPrice(item);
+			if (price <= 0) continue;
+			return price;
 		}
 	}
 

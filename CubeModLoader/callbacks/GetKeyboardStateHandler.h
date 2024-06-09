@@ -1,7 +1,20 @@
+#include "cwsdk.h"
+
+void UpdateModControlStates(GenericMod* mod, bool* diKeys) {
+	cube::Game* game = cube::GetGame();
+	mod->keybind_manager.old_control_states = mod->keybind_manager.control_states;
+	std::map<std::string, modhelper::KeybindManager::KeybindValue>* keybinds = mod->keybind_manager.GetKeybinds();
+	for (std::map<std::string, modhelper::KeybindManager::KeybindValue>::iterator it = keybinds->begin(); it != keybinds->end(); ++it) {
+		modhelper::KeybindManager::KeybindValue* keybind = &keybinds->at(it->first);
+		mod->keybind_manager.control_states.at(it->first) = diKeys[keybind->first];
+	}
+}
+
 extern "C" int GetKeyboardStateHandler(BYTE* diKeys) {
 	for (uint8_t priority = 0; priority <= 4; priority += 1) {
 		for (DLL* dll : modDLLs) {
 			if (dll->mod->OnGetKeyboardStatePriority == (GenericMod::Priority)priority) {
+				UpdateModControlStates(dll->mod, (bool*)diKeys);
 				dll->mod->OnGetKeyboardState(diKeys);
 			}
 		}

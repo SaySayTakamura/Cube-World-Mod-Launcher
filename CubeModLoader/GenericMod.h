@@ -75,6 +75,9 @@ public:
 
 	Priority OnChunkRemeshedPriority = NormalPriority;
 	virtual void OnChunkRemeshed(void* zone) {}
+
+	Priority OnCraftInventoryUpdatePriority = NormalPriority;
+	virtual void OnCraftInventoryUpdate(cube::Game* game, cube::Creature* creature, std::vector<std::vector<cube::ItemStack>>* itemVector) {}
 };
 
 #endif // GENERICMOD_H

@@ -56,6 +56,12 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 
 #include "callbacks/gui/cube__StartMenuWidget__Draw.h"
 #include "callbacks/gui/cube__CharacterPreviewWidget__Draw.h"
+#include "callbacks/gui/cube__ControlsWidget__Draw.h"
+#include "callbacks/gui/cube__ControlsWidget__ScrollDown.h"
+#include "callbacks/gui/cube__ControlsWidget__ScrollUp.h"
+#include "callbacks/gui/cube__ControlsWidget__ScrollGrab.h"
+#include "callbacks/gui/cube__ControlsWidget__ResetKeybinds.h"
+#include "callbacks/gui/cube__ControlsWidget__UpdateScrollBarPosition.h"
 #include "callbacks/gui/cube__GUI__Load.h"
 #include "callbacks/creature/cube__Creature__GetArmor.h"
 #include "callbacks/creature/cube__Creature__OnPlayerCombatDeath.h"
@@ -66,6 +72,8 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/game/cube__Game__MouseUp.h"
 #include "callbacks/game/cube__Game__HandleMouseWheel.h"
 #include "callbacks/game/cube__Game__Update.h"
+#include "callbacks/game/cube__Game__RebindControl.h"
+#include "callbacks/game/cube__Game__CraftingInventoryUpdate.h"
 #include "callbacks/item/cube__Item__OnGetBuyingPrice.h"
 #include "callbacks/item/cube__Item__OnGetSellingPrice.h"
 #include "callbacks/item/cube__Item__OnGetGoldBagValue.h"
@@ -73,25 +81,37 @@ GETTER_VAR(void*, initterm_e); // A pointer to that function
 #include "callbacks/item/cube__Item__OnGetConsumableUseTime.h"
 #include "callbacks/item/cube__Item__OnGetItemNameColor.h"
 #include "callbacks/sprite_manager/cube__SpriteManager__GetItemModelSprite.h"
+#include "callbacks/controls/cube__Controls__Save.h"
 
 void SetupHandlers() {
     setup_function(cube__Creature__GetArmor);
+    //setup_function(cube__Creature__GetNextAbilityId);
     setup_function(cube__Creature__OnPlayerCombatDeath);
     setup_function(cube__Creature__OnPlayerDrownDeath);
     setup_function(cube__Creature__OnPlayerFallDeath);
-    setup_function(cube__Creature__OnCreatureDeath);
+    setup_function(cube__Creature__OnCreatureDeath); 
     setup_function(cube__Creature__CanEquipItem);
     setup_function(cube__StartMenuWidget__Draw);
+    setup_function(cube__ControlsWidget__Draw);
+    setup_function(cube__ControlsWidget__ScrollDown);
+    setup_function(cube__ControlsWidget__ScrollUp);
+    setup_function(cube__ControlsWidget__ScrollGrab);
+    setup_function(cube__ControlsWidget__ResetKeybinds);
+    setup_function(cube__ControlsWidget__UpdateScrollBarPosition);
     //setup_function(cube__CharacterPreviewWidget__Draw);
     setup_function(cube__Game__MouseUp);
     //setup_function(cube__Game__HandleMouseWheel);
     setup_function(cube__Game__Update);
+    setup_function(cube__Game__CraftingInventoryUpdate);
+    setup_function(cube__Game__LoadItemCraft);
+    setup_function(cube__Game__RebindControl);
     setup_function(cube__Item__GetBuyingPrice);
     setup_function(cube__Item__OnGetSellingPrice);
     setup_function(cube__Item__OnGetGoldBagValue);
     setup_function(cube__Item__OnClassCanWearItem);
     setup_function(cube__Item__OnGetConsumableUseTime);
     setup_function(cube__Item__OnGetItemNameColor);
+    setup_function(cube__Controls__Save);
     setup_function(cube__SpriteManager__GetItemModelSprite);
 
     // Should be totally reverse engineered if put here.
